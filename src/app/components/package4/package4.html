@@ -1,0 +1,270 @@
+
+
+<div class="container mt-4 mb-5">
+  <form [formGroup]="packageForm" (ngSubmit)="onSubmit()">
+
+    <!-- MAIN TABS -->
+    <ul class="nav nav-tabs mb-4">
+      <li class="nav-item">
+        <button type="button" class="nav-link"
+                [class.active]="activeTab === 'info'"
+                (click)="activeTab='info'">
+          Package Info
+        </button>
+      </li>
+
+      <li class="nav-item">
+        <button type="button" class="nav-link"
+                [class.active]="activeTab === 'itinerary'"
+                (click)="activeTab='itinerary'">
+          Itinerary
+        </button>
+      </li>
+
+      <li class="nav-item">
+        <button type="button" class="nav-link"
+                [class.active]="activeTab === 'review'"
+                (click)="activeTab='review'">
+          Review
+        </button>
+      </li>
+    </ul>
+
+    <!-- ================= PACKAGE INFO ================= -->
+    <div *ngIf="activeTab === 'info'" class="card p-4 shadow-sm">
+
+      <h5 class="mb-3">Package Details</h5>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label>Package Title</label>
+          <input class="form-control"
+            formControlName="packageTitle"
+            [class.is-invalid]="packageForm.get('packageTitle')?.touched &&
+                                packageForm.get('packageTitle')?.invalid">
+          <div class="text-danger mt-1" style="font-size: 11px;"
+              *ngIf="packageForm.get('packageTitle')?.touched &&
+                      packageForm.get('packageTitle')?.invalid">
+
+            <div *ngIf="packageForm.get('packageTitle')?.errors?.['required']">
+              Package Title is required
+            </div>
+
+            <div *ngIf="packageForm.get('packageTitle')?.errors?.['minlength']">
+              Minimum 5 characters required
+            </div>
+
+            <div *ngIf="packageForm.get('packageTitle')?.errors?.['maxlength']">
+              Maximum 100 characters allowed
+            </div>
+
+            <div *ngIf="packageForm.get('packageTitle')?.errors?.['pattern']">
+              Only letters, numbers & basic symbols allowed
+            </div>
+
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label>Start Date</label>
+          <input type="date" class="form-control"
+                 (change)="onStartDateChange($event)">
+        </div>
+      </div>
+
+      <div class="text-end mt-4">
+        <button type="button" class="btn btn-primary"
+                (click)="activeTab='itinerary'">
+          Next →
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ================= ITINERARY ================= -->
+    <div *ngIf="activeTab === 'itinerary'">
+
+      <!-- DAY TABS -->
+      <ul class="nav nav-pills mb-3 flex-wrap">
+        <li class="nav-item me-2"
+            *ngFor="let day of days.controls; let i=index">
+
+          <button type="button"
+                  class="nav-link"
+                  [class.active]="selectedDayIndex === i"
+                  (click)="selectDay(i)">
+
+            Day {{i+1}} <br>
+            <small>{{ day.get('date')?.value || 'No date' }}</small>
+
+          </button>
+        </li>
+
+        <!-- ADD DAY -->
+        <li class="nav-item">
+          <button type="button"
+                  class="btn btn-success btn-sm"
+                  (click)="addDay()">
+            + Day
+          </button>
+        </li>
+      </ul>
+
+      <!-- ACTIVE DAY CONTENT -->
+      <div *ngIf="days.length > 0"
+           [formGroup]="getDayForm(selectedDayIndex)"
+           class="card p-4 shadow-sm">
+
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+          <!-- LEFT -->
+          <h5 class="mb-0">Day {{selectedDayIndex + 1}}</h5>
+
+          <!-- RIGHT -->
+          <div class="d-flex align-items-center gap-2">
+
+            <input type="date"
+                   class="form-control w-auto"
+                   formControlName="date">
+
+            <!-- DELETE ICON -->
+            <button type="button"
+                    class="btn btn-light text-danger border"
+                    (click)="removeDay(selectedDayIndex)">
+              <i class="bi bi-trash"></i>
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- TITLE -->
+        <input class="form-control mb-3"
+               placeholder="Day Title"
+               formControlName="dayTitle">
+
+        <!-- SLOTS -->
+        <div formArrayName="items">
+
+  <div *ngFor="let item of getItems(selectedDayIndex).controls; let j=index"
+       [formGroupName]="j"
+       class="slot-card p-3 mb-3">
+
+    <!-- TYPE BADGE -->
+    <span class="badge bg-primary mb-2">
+      {{ item.get('type')?.value }}
+    </span>
+
+    <!-- TIME -->
+    <input type="time" class="form-control mb-2" formControlName="time">
+
+    <!-- NAME -->
+    <input class="form-control mb-2"
+           placeholder="Enter Name (e.g. Rohtang Pass / Resort Name)"
+           formControlName="name">
+
+    <!-- VENDOR -->
+    <input class="form-control mb-2"
+           placeholder="Vendor Name"
+           formControlName="vendor">
+
+    <button type="button"
+            class="btn btn-outline-danger btn-sm"
+            (click)="removeItem(selectedDayIndex, j)">
+      Remove
+    </button>
+
+  </div>
+
+</div>
+
+        <div class="d-flex gap-2 flex-wrap mt-3">
+
+<button type="button"
+        class="btn btn-outline-info btn-sm"
+        (click)="addItem(selectedDayIndex, 'TRAVEL')">
+  + Travel
+</button>
+
+  <button type="button"
+          class="btn btn-outline-success btn-sm"
+          (click)="addItem(selectedDayIndex, 'HOTEL')">
+    + Resort/Hotel
+  </button>
+
+  <button type="button"
+          class="btn btn-outline-warning btn-sm"
+          (click)="addItem(selectedDayIndex, 'ACTIVITY')">
+    + Activity
+  </button>
+
+   <!-- NEW -->
+  <button type="button"
+          class="btn btn-outline-info btn-sm"
+          (click)="addItem(selectedDayIndex, 'TRAVEL')">
+    + Travel
+  </button>
+
+</div>
+
+      </div>
+
+      <div class="d-flex justify-content-between mt-4">
+        <button type="button" class="btn btn-secondary"
+                (click)="activeTab='info'">
+          ← Back
+        </button>
+
+        <button type="button" class="btn btn-primary"
+                (click)="activeTab='review'">
+          Next →
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ================= REVIEW ================= -->
+    <div *ngIf="activeTab === 'review'" class="card p-4 shadow-sm">
+
+      <h5>Review Package</h5>
+
+      <pre>{{ packageForm.value | json }}</pre>
+
+      <div class="d-flex justify-content-between mt-3">
+        <button type="button" class="btn btn-secondary"
+                (click)="activeTab='itinerary'">
+          ← Back
+        </button>
+
+        <button class="btn btn-success">
+          Submit Package
+        </button>
+      </div>
+
+    </div>
+
+  </form>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<div *ngIf="formErrors.length > 0" class="alert alert-danger">
+
+  <strong>Please fix the following:</strong>
+
+  <ul class="mb-0 mt-2">
+    <li *ngFor="let err of formErrors">
+      {{ err }} is required
+    </li>
+  </ul>
+
+</div>

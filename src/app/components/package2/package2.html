@@ -1,0 +1,230 @@
+<div class="container mt-4" *ngIf="packageForm">
+  <form [formGroup]="packageForm" (ngSubmit)="onSubmit()">
+
+    <div *ngFor="let field of formConfig" class="mb-3">
+
+      <!-- ================= TEXT ================= -->
+      <div *ngIf="field.type === 'TEXT'">
+        <label class="form-label">
+          {{ field.name }}
+          <span class="text-danger" *ngIf="field.required">*</span>
+        </label>
+
+        <input class="form-control"
+          [placeholder]="field.placeHolder"
+          [formControlName]="field.identifier"
+          [ngClass]="{
+            'is-invalid': packageForm.get(field.identifier)?.invalid &&
+                          packageForm.get(field.identifier)?.touched
+          }"/>
+
+        <div class="text-danger mt-1"
+          *ngIf="packageForm.get(field.identifier)?.touched">
+
+          <small *ngIf="packageForm.get(field.identifier)?.errors?.['required']">
+            Required field
+          </small>
+
+          <small *ngIf="packageForm.get(field.identifier)?.errors?.['minlength']">
+            Min {{ field.minLength }} chars
+          </small>
+
+          <small *ngIf="packageForm.get(field.identifier)?.errors?.['maxlength']">
+            Max {{ field.maxLength }} chars
+          </small>
+
+        </div>
+      </div>
+
+      <!-- ================= DAYS (TABS) ================= -->
+      <div *ngIf="field.type === 'ARRAY'">
+
+        <h5>{{ field.name }}</h5>
+
+        <button type="button" class="btn btn-primary mb-2"
+          (click)="addItem(field.identifier, field.children)">
+          + Add Day
+        </button>
+
+        <!-- TABS -->
+        <ul class="nav nav-tabs mb-3">
+          <li class="nav-item"
+              *ngFor="let day of getArray(field.identifier).controls; let i=index">
+            <button type="button"
+                    class="nav-link"
+                    [class.active]="selectedDayIndex === i"
+                    (click)="selectedDayIndex = i">
+              Day {{ i + 1 }}
+                <!-- ❌ REMOVE ICON -->
+                <i class="bi bi-x-circle text-danger ms-1"
+                    style="font-size: 14px; cursor: pointer;"
+                    (click)="removeItem(field.identifier, i); $event.stopPropagation()">
+                </i>
+            </button>
+          </li>
+        </ul>
+
+        <!-- TAB CONTENT -->
+        <div formArrayName="{{field.identifier}}">
+
+          <div *ngFor="let day of getArray(field.identifier).controls; let i=index">
+
+            <div *ngIf="selectedDayIndex === i"
+                 [formGroupName]="i"
+                 class="border p-3">
+
+              <!-- REMOVE DAY -->
+              <!-- <button type="button" class="btn btn-danger btn-sm mb-2"
+                (click)="removeItem(field.identifier, i)">
+                Remove Day
+              </button> -->
+
+              <div *ngFor="let child of field.children">
+
+                <!-- DAY TITLE -->
+                 <div *ngIf="child.type === 'TEXT'" >
+                    <label class="form-label">
+                        {{ child.name }}
+                        <span class="text-danger" *ngIf="child.required">*</span>
+                    </label>
+
+                    <input *ngIf="child.type === 'TEXT'"
+                        class="form-control mb-2"
+                        [formControlName]="child.identifier"
+                        placeholder="{{child.name}}"
+                        [ngClass]="{
+                            'is-invalid': day.get(child.identifier)?.invalid &&
+                                        day.get(child.identifier)?.touched
+                        }">
+
+                    <div class="text-danger mt-1"
+                        *ngIf="day.get(child.identifier)?.touched">
+
+                    <small *ngIf="day.get(child.identifier)?.errors?.['required']">
+                        Required field
+                    </small>
+
+                    <small *ngIf="day.get(child.identifier)?.errors?.['minlength']">
+                        Min {{ child.minLength }} chars
+                    </small>
+
+                    <small *ngIf="day.get(child.identifier)?.errors?.['maxlength']">
+                        Max {{ child.maxLength }} chars
+                    </small>
+
+                    </div>
+                </div>
+
+                <!-- ================= SLOTS ================= -->
+                <div *ngIf="child.type === 'ARRAY'">
+
+                  <button type="button" class="btn btn-success mb-2"
+                    (click)="addNestedItem(getArray(field.identifier), i, child.identifier, child.children)">
+                    + Add Slot
+                  </button>
+
+                  <div formArrayName="{{child.identifier}}">
+
+                    <div *ngFor="let slot of getNestedArray(day, child.identifier).controls; let j=index"
+                         [formGroupName]="j"
+                         class="border p-2 mb-2">
+
+                      <!-- REMOVE SLOT -->
+                      <button type="button" class="btn btn-danger btn-sm mb-2"
+                        (click)="removeNestedItem(getArray(field.identifier), i, child.identifier, j)">
+                        Remove Slot
+                      </button>
+
+                      <div *ngFor="let slotField of child.children">
+                        <div *ngIf="slotField.type === 'TIME' || slotField.type === 'TEXT'">
+
+                             <input
+                               class="form-control mb-2"
+                               [type]="slotField.type === 'TIME' ? 'time' : 'text'"
+                               [formControlName]="slotField.identifier"
+                               placeholder="{{slotField.name}}"
+                               [ngClass]="{
+                                'is-invalid': slot.get(slotField.identifier)?.invalid &&
+                                        slot.get(slotField.identifier)?.touched
+                                }">
+
+                            <div class="text-danger mt-1"
+                                *ngIf="slot.get(slotField.identifier)?.touched">
+
+                                <small *ngIf="slot.get(slotField.identifier)?.errors?.['required']">
+                                    Required field
+                                </small>
+
+                                <small *ngIf="slot.get(slotField.identifier)?.errors?.['minlength']">
+                                    Min {{ slotField.minLength }} chars
+                                </small>
+
+                                <small *ngIf="slot.get(slotField.identifier)?.errors?.['maxlength']">
+                                    Max {{ slotField.maxLength }} chars
+                                </small>
+                            </div>
+                        </div>
+
+
+                        <!-- HOTEL -->
+                        <!-- HOTEL (OBJECT) fields -->
+                        <div *ngIf="slotField.type === 'OBJECT'"
+                            [formGroupName]="slotField.identifier"
+                            class="border p-2">
+
+                        <h6>{{slotField.name}}</h6>
+
+                        <div *ngFor="let hotelField of slotField.children">
+                            <input class="form-control mb-2"
+                                [formControlName]="hotelField.identifier"
+                                placeholder="{{hotelField.name}}"
+                                [ngClass]="{
+                                    'is-invalid': slot.get(slotField.identifier)?.get(hotelField.identifier)?.invalid &&
+                                                slot.get(slotField.identifier)?.get(hotelField.identifier)?.touched
+                                }">
+
+                            <!-- Validation Messages -->
+                            <div class="text-danger mt-1"
+                                *ngIf="slot.get(slotField.identifier)?.get(hotelField.identifier)?.touched">
+
+                            <small *ngIf="slot.get(slotField.identifier)?.get(hotelField.identifier)?.errors?.['required']">
+                                {{hotelField.name}} is required
+                            </small>
+
+                            <small *ngIf="slot.get(slotField.identifier)?.get(hotelField.identifier)?.errors?.['minlength']">
+                                Min {{hotelField.minLength}} chars
+                            </small>
+
+                            <small *ngIf="slot.get(slotField.identifier)?.get(hotelField.identifier)?.errors?.['maxlength']">
+                                Max {{hotelField.maxLength}} chars
+                            </small>
+
+                            </div>
+                        </div>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <button class="btn btn-success mt-3 w-100">Submit</button>
+
+  </form>
+</div>

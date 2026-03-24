@@ -1,0 +1,140 @@
+<div class="container mt-4 mb-5">
+  <form [formGroup]="packageForm" (ngSubmit)="onSubmit()">
+
+    <!-- PACKAGE HEADER -->
+    <div class="card p-3 mb-4 shadow-sm">
+      <h4 class="mb-3">Create Tour Package</h4>
+
+      <div class="row">
+        <div class="col-md-6">
+          <label>Package Title</label>
+          <input class="form-control" formControlName="packageTitle">
+        </div>
+
+        <div class="col-md-6">
+          <label>Start Date</label>
+          <input type="date" class="form-control"
+                 (change)="onStartDateChange($event)">
+        </div>
+      </div>
+    </div>
+
+    <!-- DAYS SECTION -->
+    <div formArrayName="days">
+
+      <div *ngFor="let day of days.controls; let i=index"
+           [formGroupName]="i"
+           class="card mb-4 shadow-sm day-card"
+           [class.active-day]="selectedDayIndex === i"
+           (click)="selectDay(i)">
+
+        <!-- DAY HEADER -->
+        <div class="card-header d-flex justify-content-between align-items-center">
+
+          <div>
+            <h5 class="mb-0">Day {{i+1}}</h5>
+            <small class="text-muted">
+              {{ day.get('date')?.value || 'Select date' }}
+            </small>
+          </div>
+
+          <div class="d-flex gap-2">
+            <input type="date"
+                   class="form-control form-control-sm"
+                   formControlName="date"
+                   (click)="$event.stopPropagation()">
+
+            <button type="button"
+                    class="btn btn-sm btn-danger"
+                    (click)="removeDay(i); $event.stopPropagation()">
+              ✕
+            </button>
+          </div>
+
+        </div>
+
+        <!-- DAY BODY -->
+        <div class="card-body">
+
+          <!-- DAY TITLE -->
+          <input class="form-control mb-3"
+                 placeholder="Enter Day Title (e.g. Arrival in Manali)"
+                 formControlName="dayTitle">
+
+          <!-- SLOTS -->
+          <div formArrayName="slots">
+
+            <div *ngFor="let slot of getSlots(i).controls; let j=index"
+                 [formGroupName]="j"
+                 class="slot-card p-3 mb-3">
+
+              <!-- TIME -->
+              <div class="row g-2">
+                <div class="col-md-3">
+                  <label>Start</label>
+                  <input type="time" class="form-control" formControlName="startTime">
+                </div>
+                <div class="col-md-3">
+                  <label>End</label>
+                  <input type="time" class="form-control" formControlName="endTime">
+                </div>
+
+                <div class="col-md-6 text-end">
+                  <button type="button"
+                          class="btn btn-sm btn-outline-danger mt-4"
+                          (click)="removeSlot(i, j)">
+                    Remove Slot
+                  </button>
+                </div>
+              </div>
+
+              <!-- ACTIVITY -->
+              <input class="form-control mt-3"
+                     placeholder="Enter Activity (Sightseeing, Travel, etc)"
+                     formControlName="activity">
+
+              <!-- HOTEL -->
+              <div formGroupName="hotel" class="row mt-3 g-2">
+                <div class="col-md-6">
+                  <input class="form-control"
+                         placeholder="Hotel Name"
+                         formControlName="hotelName">
+                </div>
+                <div class="col-md-6">
+                  <input class="form-control"
+                         placeholder="City"
+                         formControlName="city">
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ADD SLOT -->
+          <button type="button"
+                  class="btn btn-outline-primary btn-sm"
+                  (click)="addSlot(i)">
+            + Add Slot
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ADD DAY -->
+    <div class="text-center mb-4">
+      <button type="button" class="btn btn-success px-4" (click)="addDay()">
+        + Add New Day
+      </button>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="text-center">
+      <button class="btn btn-dark px-5">Save Package</button>
+    </div>
+
+  </form>
+</div>

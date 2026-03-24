@@ -1,0 +1,106 @@
+/* ===== DAY CARD ===== */
+.day-card {
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+}
+
+.day-card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+/* ACTIVE DAY */
+.active-day {
+  border: 2px solid #0d6efd;
+  background: #f0f6ff;
+}
+
+/* ===== SLOT CARD ===== */
+.slot-card {
+  border: 1px dashed #ccc;
+  border-radius: 10px;
+  background: #fafafa;
+  transition: 0.3s;
+}
+
+.slot-card:hover {
+  background: #f4f8ff;
+  border-color: #0d6efd;
+}
+
+/* ===== FORM INPUT ===== */
+input.form-control,
+select.form-control,
+textarea.form-control {
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.form-control.is-invalid,
+.form-control.is-invalid:focus {
+  border-color: #dc3545 !important;
+  box-shadow: none !important;
+}
+
+/* input.form-control:focus,
+select.form-control:focus,
+textarea.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 5px rgba(13,110,253,0.2);
+} */
+
+/* ===== BUTTONS ===== */
+.btn {
+  border-radius: 8px;
+}
+
+/* ===== NAV TABS ===== */
+.nav-tabs .nav-link {
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  padding: 10px 15px;
+}
+
+.nav-tabs .nav-link.active {
+  background: #0d6efd;
+  color: #fff;
+  border-color: #0d6efd;
+}
+
+/* ===== DAY PILLS (TOP TABS) ===== */
+.nav-pills .nav-link {
+  border-radius: 10px;
+  padding: 8px 14px;
+  background: #f5f5f5;
+  margin-bottom: 5px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.nav-pills .nav-link small {
+  display: block;
+  font-size: 11px;
+}
+
+.nav-pills .nav-link.active {
+  background: #0d6efd;
+  color: #fff;
+}
+
+/* ===== CARD SHADOW ===== */
+.card {
+  border-radius: 12px;
+  border: none;
+}
+
+/* ===== SMOOTH UI ===== */
+button {
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}

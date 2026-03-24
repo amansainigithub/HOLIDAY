@@ -1,0 +1,100 @@
+<div class="container mt-4">
+
+  <form [formGroup]="packageForm" (ngSubmit)="submit()">
+
+    <!-- BASIC -->
+    <div class="card p-3">
+      <h5>Basic</h5>
+      <input class="form-control mb-2" placeholder="Title" formControlName="title">
+      <textarea class="form-control mb-2" placeholder="Description" formControlName="description"></textarea>
+    </div>
+
+    <!-- IMAGES -->
+    <div class="card p-3 mt-3">
+      <h5>Images</h5>
+
+      <div formArrayName="images">
+        <div *ngFor="let img of images.controls; let i=index" [formGroupName]="i" class="border p-2 mb-2">
+          <input class="form-control mb-1" placeholder="URL" formControlName="url">
+          <input class="form-control mb-1" placeholder="Alt Text" formControlName="altText">
+          <input type="checkbox" formControlName="isPrimary"> Primary
+          <button class="btn btn-danger btn-sm ms-2" (click)="removeImage(i)">X</button>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-success btn-sm" (click)="addImage()">+ Add Image</button>
+    </div>
+
+    <!-- INCLUSIONS -->
+    <div class="card p-3 mt-3">
+      <h5>Inclusions</h5>
+
+      <div formArrayName="inclusions">
+        <div *ngFor="let inc of inclusions.controls; let i=index" [formGroupName]="i">
+          <input class="form-control mb-2" placeholder="Inclusion" formControlName="title">
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-success btn-sm" (click)="addInclusion()">+ Add</button>
+    </div>
+
+    <!-- EXCLUSIONS -->
+    <div class="card p-3 mt-3">
+      <h5>Exclusions</h5>
+
+      <div formArrayName="exclusions">
+        <div *ngFor="let exc of exclusions.controls; let i=index" [formGroupName]="i">
+          <input class="form-control mb-2" placeholder="Exclusion" formControlName="title">
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-danger btn-sm" (click)="addExclusion()">+ Add</button>
+    </div>
+
+    <!-- DAYS -->
+   <!-- DAYS -->
+<div class="card p-3 mt-3">
+  <h5>Days</h5>
+
+  <div formArrayName="daysList">
+    <div *ngFor="let day of daysList.controls; let di=index" [formGroupName]="di" class="border p-3 mt-2">
+
+      <input class="form-control mb-2" placeholder="Day Title" formControlName="title">
+
+      <!-- SLOTS -->
+      <div formArrayName="slots">
+        <div *ngFor="let slot of getSlots(di).controls; let si=index"
+             [formGroupName]="si"
+             class="border p-2 mt-2">
+
+          <input type="time" class="form-control mb-1" formControlName="startTime">
+          <input type="time" class="form-control mb-1" formControlName="endTime">
+          <input class="form-control mb-2" placeholder="Activity" formControlName="activity">
+
+          <!-- HOTEL -->
+          <div formGroupName="hotel" class="border p-2">
+            <input class="form-control mb-1" placeholder="Hotel Name" formControlName="hotelName">
+            <input class="form-control mb-1" placeholder="City" formControlName="city">
+            <input class="form-control mb-1" placeholder="Location" formControlName="location">
+          </div>
+
+          <button type="button" class="btn btn-danger btn-sm mt-2" (click)="removeSlot(di, si)">
+            Remove Slot
+          </button>
+
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-info btn-sm mt-2" (click)="addSlot(di)">+ Add Slot</button>
+      <button type="button" class="btn btn-danger btn-sm mt-2" (click)="removeDay(di)">Remove Day</button>
+
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-success mt-2" (click)="addDay()">+ Add Day</button>
+</div>
+
+    <button class="btn btn-primary mt-4 w-100">Save Package</button>
+
+  </form>
+</div>
