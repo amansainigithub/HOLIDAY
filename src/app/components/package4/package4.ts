@@ -460,14 +460,19 @@ sampleData = {
     startDate: "2026-04-10",
     packageImages: [
         {
-            url: "https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b",
-            fileName: "dehradun_view.jpg",
+            url: "https://images.unsplash.com/photo-1598890777032-bde835ba27c2",
+            fileName: "bing-hui-yau-y85Tir86Q34-unsplash.jpg",
             title: "Dehradun Scenic View"
         },
         {
-            url: "https://images.unsplash.com/photo-1595526118235-9b6e6d144e16",
-            fileName: "robber_cave.jpg",
+            url: "https://images.unsplash.com/photo-1598890777032-bde835ba27c2",
+            fileName: "WhatsApp Image 2025-12-09 at 12.48.38 PM.jpeg",
             title: "Robber's Cave"
+        },
+        {
+            url: "https://images.unsplash.com/photo-1598890777032-bde835ba27c2",
+            fileName: "landingimage2.png",
+            title: "Forest Research Institute"
         }
     ],
     days: [
@@ -595,9 +600,35 @@ sampleData = {
 
 
   loadDataFromBackend(backendData: any) {
-    const formData = this.transformBackendToFormData(backendData);
-    this.patchForm(formData);
-  }
+  const formData = this.transformBackendToFormData(backendData);
+
+  // patch form values
+  this.packageForm.patchValue({
+    packageTitle: formData.packageTitle,
+    startDate: formData.startDate,
+    packageImages: formData.packageImages || [],
+  });
+
+  // sync component image array for preview
+  this.images = formData.packageImages || [];
+
+  // clear days and patch them
+  this.days.clear();
+  formData.days.forEach((day: any) => {
+    const dayGroup = this.createDay();
+    this.days.push(dayGroup);
+    dayGroup.patchValue({ dayTitle: day.dayTitle, date: day.date });
+
+    const itemsArray = dayGroup.get('items') as FormArray;
+    day.items.forEach((item: any) => {
+      const itemGroup = this.createItem(item.type);
+      itemGroup.patchValue(item);
+      itemsArray.push(itemGroup);
+    });
+  });
+
+  this.selectedDayIndex = 0;
+}
 
   patchForm(data: any) {
     this.packageForm.patchValue({
