@@ -456,92 +456,118 @@ getFormErrors(): string[] {
 
 // ==================== BACKEND → FORM ====================
 sampleData = {
-    packageTitle: "Manali & Shimla Trip",
-    startDate: "2026-03-25",
-    packageImages: [],
+    packageTitle: "Dehradun Adventure Trip",
+    startDate: "2026-04-10",
+    packageImages: [
+        {
+            url: "https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b",
+            fileName: "dehradun_view.jpg",
+            title: "Dehradun Scenic View"
+        },
+        {
+            url: "https://images.unsplash.com/photo-1595526118235-9b6e6d144e16",
+            fileName: "robber_cave.jpg",
+            title: "Robber's Cave"
+        }
+    ],
     days: [
         {
-            dayTitle: "Day 1: Arrival & Local Sightseeing",
-            date: "2026-03-25",
+            dayTitle: "Day 1: Arrival & City Exploration",
+            date: "2026-04-10",
             travels: [
                 {
                     from: "Delhi",
-                    to: "Manali",
+                    to: "Dehradun",
                     mode: "Bus",
-                    time: "08:00"
+                    time: "07:00"
                 }
             ],
             hotels: [
                 {
-                    hotelName: "Snow View Resort",
-                    city: "Manali",
-                    checkIn: "2026-03-25",
-                    checkOut: "2026-03-27"
+                    hotelName: "Hotel Pacific Dehradun",
+                    city: "Dehradun",
+                    checkIn: "2026-04-10",
+                    checkOut: "2026-04-12"
                 }
             ],
             sightseeing: [
                 {
-                    placeName: "Hidimba Temple",
-                    description: "Historic temple surrounded by cedar forest.",
-                    time: "10:30"
+                    placeName: "Robber's Cave",
+                    description: "A natural cave formation with a river running inside.",
+                    time: "11:00"
+                },
+                {
+                    placeName: "Forest Research Institute",
+                    description: "Historic institute with beautiful colonial architecture and museums.",
+                    time: "15:00"
                 }
             ],
             activities: [
                 {
-                    activityName: "River Rafting",
+                    activityName: "Local Market Walk",
                     duration: "2 hours",
-                    vendor: "Adventure Club Manali"
+                    vendor: "City Tour Guide"
                 }
             ],
             meals: [
                 {
                     mealType: "Breakfast",
-                    menu: "Pancakes, Tea, Fruit",
+                    menu: "Paratha, Tea, Fruit",
                     time: "07:30"
+                },
+                {
+                    mealType: "Lunch",
+                    menu: "Dal Makhani, Rice, Salad",
+                    time: "13:00"
+                },
+                {
+                    mealType: "Dinner",
+                    menu: "Paneer Butter Masala, Roti, Dessert",
+                    time: "20:00"
                 }
             ]
         },
         {
-            dayTitle: "Day 2: Solang Valley & Leisure",
-            date: "2026-03-26",
+            dayTitle: "Day 2: Adventure & Nature",
+            date: "2026-04-11",
             travels: [
                 {
-                    from: "Manali",
-                    to: "Solang Valley",
+                    from: "Dehradun",
+                    to: "Malsi Deer Park",
                     mode: "Car",
                     time: "09:00"
                 }
             ],
             hotels: [
                 {
-                    hotelName: "Snow View Resort",
-                    city: "Manali",
-                    checkIn: "2026-03-25",
-                    checkOut: "2026-03-27"
+                    hotelName: "Hotel Pacific Dehradun",
+                    city: "Dehradun",
+                    checkIn: "2026-04-10",
+                    checkOut: "2026-04-12"
                 }
             ],
             sightseeing: [
                 {
-                    placeName: "Solang Valley",
-                    description: "Famous for paragliding and snow sports.",
-                    time: "10:30"
+                    placeName: "Mindrolling Monastery",
+                    description: "One of the largest Buddhist centers in India.",
+                    time: "11:00"
                 },
                 {
-                    placeName: "Naggar Castle",
-                    description: "Historic castle with Himalayan views.",
+                    placeName: "Tapkeshwar Temple",
+                    description: "Ancient cave temple dedicated to Lord Shiva.",
                     time: "15:00"
                 }
             ],
             activities: [
                 {
-                    activityName: "Paragliding",
-                    duration: "1 hour",
-                    vendor: "Himalayan Flyers"
+                    activityName: "River Rafting in Song River",
+                    duration: "2 hours",
+                    vendor: "Adventure Club Dehradun"
                 },
                 {
-                    activityName: "Horse Riding",
-                    duration: "30 minutes",
-                    vendor: "Solang Riders"
+                    activityName: "Hiking to Sahastradhara",
+                    duration: "3 hours",
+                    vendor: "Local Trekking Guide"
                 }
             ],
             meals: [
