@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -10,7 +11,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class Package4 {
  packageForm!: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder , private http:HttpClient) {}
 
   ngOnInit() {
     this.packageForm = this.fb.group({
@@ -21,6 +22,7 @@ export class Package4 {
                           Validators.pattern(/^[a-zA-Z0-9\s\-&()]+$/) // special chars restrict
                         ]],
       startDate: [''], // 👈 ADD THIS
+      packageImages: [[]], // 👈 yaha images store hongi
       days: this.fb.array([])
     });
 
@@ -29,7 +31,7 @@ export class Package4 {
 
     // 👇 API simulate
   setTimeout(() => {
-    this.patchForm(this.sampleData);
+    this.loadDataFromBackend(this.sampleData);
   }, 2000);
   }
 
@@ -120,6 +122,15 @@ createItem(type: string): FormGroup {
     });
   }
 
+  if (type === 'MEAL') {
+  return this.fb.group({
+    type: [type],
+    mealType: ['', Validators.required], // Breakfast/Lunch/Dinner
+    menu: ['', Validators.required],
+    time: ['']
+  });
+}
+
   return this.fb.group({});
 }
 
@@ -193,6 +204,57 @@ removeItem(dayIndex: number, itemIndex: number) {
 
 
 
+// IMAGES=======================================
+images: any[] = [];
+
+onFileSelect(event: any) {
+  const files = event.target.files;
+
+  for (let file of files) {
+    this.uploadImage(file);
+  }
+}
+
+uploadImage(file: File) {
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  this.http.post<any>('YOUR_API_URL', formData).subscribe({
+    next: (res) => {
+
+      // EXPECTED RESPONSE
+      // { url, fileName, title }
+
+      this.images.push({
+        url: res.url,
+        fileName: res.fileName,
+        title: res.title
+      });
+
+    },
+    error: () => {
+
+      // 🔥 DUMMY FALLBACK
+      const dummy = {
+        url: 'https://images.unsplash.com/photo-1598890777032-bde835ba27c2',
+        fileName: file.name,
+        title: 'Dummy Image'
+      };
+
+      this.images.push(dummy);
+    }
+  });
+}
+
+saveImages() {
+  // 👉 Add into main package form
+  this.packageForm.patchValue({
+    packageImages: this.images
+  });
+
+  console.log("Saved Images", this.images);
+}
 
 
 
@@ -203,22 +265,116 @@ removeItem(dayIndex: number, itemIndex: number) {
 
 
 
-  // ===== SUBMIT =====
+
+
+
+
+
+
+
+
+// ====================================SUBMIT  DATA AND TRANSFORM DATA=============================================================================
+  // ===== SUBMIT  DATA AND TRANSFORM DATA=================================================================================
 onSubmit() {
   if (this.packageForm.invalid) {
     this.packageForm.markAllAsTouched();
-
-    this.formErrors = this.getFormErrors(); // 👈 collect errors
+    this.formErrors = this.getFormErrors();
     return;
   }
 
-  this.formErrors = [];
-  console.log(this.packageForm.value);
-}
+  console.log(this.packageForm);
   
 
+  // FRONTEND ITEMS → BACKEND CONVERT DATA STRUCTURE
+  const transformedDays = this.transformItemsToBackend(this.packageForm.value.days);
 
-  formErrors: string[] = [];
+  const payload = {
+    packageTitle: this.packageForm.value.packageTitle,
+    startDate: this.packageForm.value.startDate,
+    packageImages: this.packageForm.value.packageImages,
+    days: transformedDays
+  };
+
+  console.log("Backend Payload:", payload);
+  // this.http.post('YOUR_API_URL', payload).subscribe(...)
+}
+
+
+
+
+transformItemsToBackend(days: any[]): any[] {
+  return days.map(day => {
+    const backendDay: any = {
+      dayTitle: day.dayTitle,
+      date: day.date,
+      travels: [],
+      hotels: [],
+      sightseeing: [],
+      activities: [],
+      meals: []
+    };
+
+    if (day.items && day.items.length > 0) {
+      day.items.forEach((item: any) => {
+        switch(item.type) {
+          case 'TRAVEL':
+            backendDay.travels.push({
+              from: item.from,
+              to: item.to,
+              mode: item.mode,
+              time: item.time
+            });
+            break;
+
+          case 'HOTEL':
+            backendDay.hotels.push({
+              hotelName: item.hotelName,
+              city: item.city,
+              checkIn: item.checkIn,
+              checkOut: item.checkOut
+            });
+            break;
+
+          case 'SIGHTSEEING':
+            backendDay.sightseeing.push({
+              placeName: item.placeName,
+              description: item.description,
+              time: item.time
+            });
+            break;
+
+          case 'ACTIVITY':
+            backendDay.activities.push({
+              activityName: item.activityName,
+              duration: item.duration,
+              vendor: item.vendor
+            });
+            break;
+
+          case 'MEAL':
+            backendDay.meals.push({
+              mealType: item.mealType,
+              menu: item.menu,
+              time: item.time
+            });
+            break;
+
+          default:
+            break;
+        }
+      });
+    }
+
+    return backendDay;
+  });
+}
+
+
+
+
+
+
+formErrors: string[] = [];
 
 getFormErrors(): string[] {
   const errors: string[] = [];
@@ -263,6 +419,8 @@ getFormErrors(): string[] {
   return errors;
 }
 
+// ========================================SUBMIT  DATA AND TRANSFORM DATA=========================================
+// ========================================SUBMIT  DATA AND TRANSFORM DATA=========================================
 
 
 
@@ -296,134 +454,164 @@ getFormErrors(): string[] {
 
 
 
-
-
-
-
-
-
-
-
+// ==================== BACKEND → FORM ====================
 sampleData = {
-  packageTitle: "Dehradun Package",
-  startDate: "2026-03-25",
-  days: [
-    {
-      dayTitle: "day 1 masti bazi",
-      date: "2026-03-24",
-      items: [
+    packageTitle: "Manali & Shimla Trip",
+    startDate: "2026-03-25",
+    packageImages: [],
+    days: [
         {
-          type: "TRAVEL",
-          from: "calvin hotel ",
-          to: "mahadevi hotel",
-          mode: "BUS",
-          time: "02:40"
+            dayTitle: "Day 1: Arrival & Local Sightseeing",
+            date: "2026-03-25",
+            travels: [
+                {
+                    from: "Delhi",
+                    to: "Manali",
+                    mode: "Bus",
+                    time: "08:00"
+                }
+            ],
+            hotels: [
+                {
+                    hotelName: "Snow View Resort",
+                    city: "Manali",
+                    checkIn: "2026-03-25",
+                    checkOut: "2026-03-27"
+                }
+            ],
+            sightseeing: [
+                {
+                    placeName: "Hidimba Temple",
+                    description: "Historic temple surrounded by cedar forest.",
+                    time: "10:30"
+                }
+            ],
+            activities: [
+                {
+                    activityName: "River Rafting",
+                    duration: "2 hours",
+                    vendor: "Adventure Club Manali"
+                }
+            ],
+            meals: [
+                {
+                    mealType: "Breakfast",
+                    menu: "Pancakes, Tea, Fruit",
+                    time: "07:30"
+                }
+            ]
         },
         {
-          type: "SIGHTSEEING",
-          placeName: "snowfall",
-          description: "desasjnshkjd dsfdfs",
-          time: "12:21"
-        },
-        {
-          type: "HOTEL",
-          hotelName: "vabhav hotes 5 start rating",
-          city: "dehradun",
-          checkIn: "2026-03-25",
-          checkOut: "2026-03-26"
-        },
-        {
-          type: "ACTIVITY",
-          activityName: "night activity",
-          duration: "5 hourds",
-          vendor: "Aman Saini"
-        },
-        {
-          type: "TRAVEL",
-          from: "travel 2 day 1",
-          to: "maha shiv temple",
-          mode: "bus",
-          time: "11:11"
-        },
-        {
-          type: "SIGHTSEEING",
-          placeName: "pahal dun das",
-          description: "sasasasa",
-          time: "12:21"
+            dayTitle: "Day 2: Solang Valley & Leisure",
+            date: "2026-03-26",
+            travels: [
+                {
+                    from: "Manali",
+                    to: "Solang Valley",
+                    mode: "Car",
+                    time: "09:00"
+                }
+            ],
+            hotels: [
+                {
+                    hotelName: "Snow View Resort",
+                    city: "Manali",
+                    checkIn: "2026-03-25",
+                    checkOut: "2026-03-27"
+                }
+            ],
+            sightseeing: [
+                {
+                    placeName: "Solang Valley",
+                    description: "Famous for paragliding and snow sports.",
+                    time: "10:30"
+                },
+                {
+                    placeName: "Naggar Castle",
+                    description: "Historic castle with Himalayan views.",
+                    time: "15:00"
+                }
+            ],
+            activities: [
+                {
+                    activityName: "Paragliding",
+                    duration: "1 hour",
+                    vendor: "Himalayan Flyers"
+                },
+                {
+                    activityName: "Horse Riding",
+                    duration: "30 minutes",
+                    vendor: "Solang Riders"
+                }
+            ],
+            meals: [
+                {
+                    mealType: "Breakfast",
+                    menu: "Omelette, Toast, Coffee",
+                    time: "07:30"
+                },
+                {
+                    mealType: "Lunch",
+                    menu: "Rajma, Rice, Salad",
+                    time: "13:00"
+                },
+                {
+                    mealType: "Dinner",
+                    menu: "Mixed Veg Curry, Roti, Dessert",
+                    time: "20:00"
+                }
+            ]
         }
-      ]
-    },
-    {
-      dayTitle: "day 2 to mussorie",
-      date: "2026-03-25",
-      items: [
-        {
-          type: "TRAVEL",
-          from: "dehradun",
-          to: "mussorie",
-          mode: "FLIGHT",
-          time: "12:21"
-        },
-        {
-          type: "SIGHTSEEING",
-          placeName: "villager",
-          description: "sdajdsdkak",
-          time: "12:21"
-        },
-        {
-          type: "HOTEL",
-          hotelName: "plain castel hotel ",
-          city: "mussorie ",
-          checkIn: "2026-03-18",
-          checkOut: "2026-03-19"
-        },
-        {
-          type: "ACTIVITY",
-          activityName: "fire activity night 12",
-          duration: "5",
-          vendor: "ishu suryavanshi"
-        }
-      ]
-    }
-  ]
+    ]
 }
 
-patchForm(data: any) {
 
-  // reset form
-  this.packageForm.patchValue({
-    packageTitle: data.packageTitle,
-    startDate: data.startDate
-  });
 
-  this.days.clear();
 
-  data.days.forEach((d: any) => {
+  loadDataFromBackend(backendData: any) {
+    const formData = this.transformBackendToFormData(backendData);
+    this.patchForm(formData);
+  }
 
-    const dayGroup = this.createDay();
-    this.days.push(dayGroup);
-
-    dayGroup.patchValue({
-      dayTitle: d.dayTitle,
-      date: d.date
+  patchForm(data: any) {
+    this.packageForm.patchValue({
+      packageTitle: data.packageTitle,
+      startDate: data.startDate,
+      packageImages: data.packageImages || [],
     });
 
-    const itemsArray = dayGroup.get('items') as FormArray;
+    this.days.clear();
 
-    d.items.forEach((item: any) => {
+    data.days.forEach((day: any) => {
+      const dayGroup = this.createDay();
+      this.days.push(dayGroup);
+      dayGroup.patchValue({ dayTitle: day.dayTitle, date: day.date });
 
-      const itemGroup = this.createItem(item.type);
-
-      itemGroup.patchValue(item);
-
-      itemsArray.push(itemGroup);
-
+      const itemsArray = dayGroup.get('items') as FormArray;
+      day.items.forEach((item: any) => {
+        const itemGroup = this.createItem(item.type);
+        itemGroup.patchValue(item);
+        itemsArray.push(itemGroup);
+      });
     });
 
-  });
+    this.selectedDayIndex = 0;
+  }
 
-  this.selectedDayIndex = 0;
-}
+  transformBackendToFormData(data: any) {
+    const transformed = { ...data };
+    transformed.days = transformed.days.map((day: any) => {
+      const items: any[] = [];
+      if (day.travels) day.travels.forEach((t: any) => items.push({ ...t, type: 'TRAVEL' }));
+      if (day.hotels) day.hotels.forEach((h: any) => items.push({ ...h, type: 'HOTEL' }));
+      if (day.sightseeing) day.sightseeing.forEach((s: any) => items.push({ ...s, type: 'SIGHTSEEING' }));
+      if (day.activities) day.activities.forEach((a: any) => items.push({ ...a, type: 'ACTIVITY' }));
+      if (day.meals) day.meals.forEach((m: any) => items.push({ ...m, type: 'MEAL' }));
+      return { ...day, items };
+    });
+    return transformed;
+  }
+
 
   
 }

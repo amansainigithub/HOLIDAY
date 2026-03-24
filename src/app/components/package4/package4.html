@@ -72,6 +72,64 @@
         </div>
       </div>
 
+      <div class="row g-3">
+          <!-- PACKAGE INFO -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5>Package Info</h5>
+
+              <!-- SMALL BUTTON -->
+              <button type="button"
+                      class="btn btn-sm btn-primary"
+                      data-bs-toggle="modal"
+                      data-bs-target="#imageModal">
+                Upload Images
+              </button>
+            </div>
+
+
+            <!-- MODAL S IMAGES INFO -->
+                <div class="modal fade" id="imageModal" tabindex="-1">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+
+                      <div class="modal-header">
+                        <h5 class="modal-title">Upload Package Images</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+
+                      <div class="modal-body">
+
+                        <!-- FILE INPUT -->
+                        <input type="file" class="form-control mb-3"
+                              (change)="onFileSelect($event)" multiple>
+
+                        <!-- PREVIEW -->
+                        <div class="row">
+                          <div class="col-md-4 mb-3" *ngFor="let img of images">
+                            <div class="card">
+                              <img [src]="img.url" class="card-img-top" height="150">
+                              <div class="card-body p-2">
+                                <small>{{img.fileName}}</small><br>
+                                <small class="text-muted">{{img.title}}</small>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+
+                      <div class="modal-footer">
+                        <button class="btn btn-success" (click)="saveImages()">Save</button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                 <!-- MODAL ENDING IMAGES INFO -->
+      </div>
+
+
+
       <div class="text-end mt-4">
         <button type="button" class="btn btn-primary"
                 (click)="activeTab='itinerary'">
@@ -218,6 +276,20 @@
 
   </div>
 
+  <!-- ================= MEAL ================= -->
+  <div *ngIf="item.get('type')?.value === 'MEAL'">
+
+    <input class="form-control mb-2" placeholder="Meal Type (Breakfast/Lunch/Dinner)"
+          formControlName="mealType">
+
+    <input class="form-control mb-2" placeholder="Menu"
+          formControlName="menu">
+
+    <input type="time" class="form-control mb-2"
+          formControlName="time">
+
+  </div>
+
   <!-- REMOVE -->
   <button type="button"
           class="btn btn-outline-danger btn-sm"
@@ -259,6 +331,13 @@
     + Activity
   </button>
 
+  <!-- 5️⃣ MEAL -->
+<button type="button"
+        class="btn btn-outline-secondary btn-sm"
+        (click)="addItem(selectedDayIndex, 'MEAL')">
+  + Meal
+</button>
+
 </div>
 
       </div>
@@ -299,6 +378,10 @@
 
   </form>
 </div>
+
+
+
+
 
 
 
