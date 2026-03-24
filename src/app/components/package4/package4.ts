@@ -20,10 +20,17 @@ export class Package4 {
                           Validators.maxLength(100),
                           Validators.pattern(/^[a-zA-Z0-9\s\-&()]+$/) // special chars restrict
                         ]],
+      startDate: [''], // 👈 ADD THIS
       days: this.fb.array([])
     });
 
     this.addDay(); // default 1 day
+
+
+    // 👇 API simulate
+  setTimeout(() => {
+    this.patchForm(this.sampleData);
+  }, 2000);
   }
 
   // ===== DAYS =====
@@ -69,16 +76,51 @@ addDay() {
   this.days.push(day);
 
   // default ek item (slot) open hoga
+   this.addItem(this.days.length - 1, 'TRAVEL');
   this.addItem(this.days.length - 1, 'SIGHTSEEING');
 }
 
 createItem(type: string): FormGroup {
-  return this.fb.group({
-    type: [type],
-    name: [''],
-    vendor: [''],
-    time: ['']
-  });
+
+  if (type === 'TRAVEL') {
+    return this.fb.group({
+      type: [type],
+      from: ['', Validators.required],
+      to: ['', Validators.required],
+      mode: [''], // bus / flight / cab
+      time: ['', Validators.required]
+    });
+  }
+
+  if (type === 'HOTEL') {
+    return this.fb.group({
+      type: [type],
+      hotelName: ['', Validators.required],
+      city: ['', Validators.required],
+      checkIn: [''],
+      checkOut: ['']
+    });
+  }
+
+  if (type === 'SIGHTSEEING') {
+    return this.fb.group({
+      type: [type],
+      placeName: ['', Validators.required],
+      description: [''],
+      time: ['']
+    });
+  }
+
+  if (type === 'ACTIVITY') {
+    return this.fb.group({
+      type: [type],
+      activityName: ['', Validators.required],
+      duration: [''],
+      vendor: ['']
+    });
+  }
+
+  return this.fb.group({});
 }
 
 getItems(dayIndex: number): FormArray {
@@ -223,6 +265,165 @@ getFormErrors(): string[] {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sampleData = {
+  packageTitle: "Dehradun Package",
+  startDate: "2026-03-25",
+  days: [
+    {
+      dayTitle: "day 1 masti bazi",
+      date: "2026-03-24",
+      items: [
+        {
+          type: "TRAVEL",
+          from: "calvin hotel ",
+          to: "mahadevi hotel",
+          mode: "BUS",
+          time: "02:40"
+        },
+        {
+          type: "SIGHTSEEING",
+          placeName: "snowfall",
+          description: "desasjnshkjd dsfdfs",
+          time: "12:21"
+        },
+        {
+          type: "HOTEL",
+          hotelName: "vabhav hotes 5 start rating",
+          city: "dehradun",
+          checkIn: "2026-03-25",
+          checkOut: "2026-03-26"
+        },
+        {
+          type: "ACTIVITY",
+          activityName: "night activity",
+          duration: "5 hourds",
+          vendor: "Aman Saini"
+        },
+        {
+          type: "TRAVEL",
+          from: "travel 2 day 1",
+          to: "maha shiv temple",
+          mode: "bus",
+          time: "11:11"
+        },
+        {
+          type: "SIGHTSEEING",
+          placeName: "pahal dun das",
+          description: "sasasasa",
+          time: "12:21"
+        }
+      ]
+    },
+    {
+      dayTitle: "day 2 to mussorie",
+      date: "2026-03-25",
+      items: [
+        {
+          type: "TRAVEL",
+          from: "dehradun",
+          to: "mussorie",
+          mode: "FLIGHT",
+          time: "12:21"
+        },
+        {
+          type: "SIGHTSEEING",
+          placeName: "villager",
+          description: "sdajdsdkak",
+          time: "12:21"
+        },
+        {
+          type: "HOTEL",
+          hotelName: "plain castel hotel ",
+          city: "mussorie ",
+          checkIn: "2026-03-18",
+          checkOut: "2026-03-19"
+        },
+        {
+          type: "ACTIVITY",
+          activityName: "fire activity night 12",
+          duration: "5",
+          vendor: "ishu suryavanshi"
+        }
+      ]
+    }
+  ]
+}
+
+patchForm(data: any) {
+
+  // reset form
+  this.packageForm.patchValue({
+    packageTitle: data.packageTitle,
+    startDate: data.startDate
+  });
+
+  this.days.clear();
+
+  data.days.forEach((d: any) => {
+
+    const dayGroup = this.createDay();
+    this.days.push(dayGroup);
+
+    dayGroup.patchValue({
+      dayTitle: d.dayTitle,
+      date: d.date
+    });
+
+    const itemsArray = dayGroup.get('items') as FormArray;
+
+    d.items.forEach((item: any) => {
+
+      const itemGroup = this.createItem(item.type);
+
+      itemGroup.patchValue(item);
+
+      itemsArray.push(itemGroup);
+
+    });
+
+  });
+
+  this.selectedDayIndex = 0;
+}
 
   
 }

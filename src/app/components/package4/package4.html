@@ -67,7 +67,7 @@
 
         <div class="col-md-6">
           <label>Start Date</label>
-          <input type="date" class="form-control"
+          <input type="date" class="form-control" formControlName="startDate"
                  (change)="onStartDateChange($event)">
         </div>
       </div>
@@ -148,62 +148,115 @@
         <div formArrayName="items">
 
   <div *ngFor="let item of getItems(selectedDayIndex).controls; let j=index"
-       [formGroupName]="j"
-       class="slot-card p-3 mb-3">
+     [formGroupName]="j"
+     class="slot-card p-3 mb-3">
 
-    <!-- TYPE BADGE -->
-    <span class="badge bg-primary mb-2">
-      {{ item.get('type')?.value }}
-    </span>
+  <!-- TYPE -->
+  <span class="badge bg-primary mb-2">
+    {{ item.get('type')?.value }}
+  </span>
 
-    <!-- TIME -->
-    <input type="time" class="form-control mb-2" formControlName="time">
+  <!-- ================= TRAVEL ================= -->
+  <div *ngIf="item.get('type')?.value === 'TRAVEL'">
 
-    <!-- NAME -->
-    <input class="form-control mb-2"
-           placeholder="Enter Name (e.g. Rohtang Pass / Resort Name)"
-           formControlName="name">
+    <input class="form-control mb-2" placeholder="From"
+           formControlName="from">
 
-    <!-- VENDOR -->
-    <input class="form-control mb-2"
-           placeholder="Vendor Name"
-           formControlName="vendor">
+    <input class="form-control mb-2" placeholder="To"
+           formControlName="to">
 
-    <button type="button"
-            class="btn btn-outline-danger btn-sm"
-            (click)="removeItem(selectedDayIndex, j)">
-      Remove
-    </button>
+    <input class="form-control mb-2" placeholder="Mode (Bus/Flight)"
+           formControlName="mode">
+
+    <input type="time" class="form-control mb-2"
+           formControlName="time">
 
   </div>
+
+  <!-- ================= HOTEL ================= -->
+  <div *ngIf="item.get('type')?.value === 'HOTEL'">
+
+    <input class="form-control mb-2" placeholder="Hotel Name"
+           formControlName="hotelName">
+
+    <input class="form-control mb-2" placeholder="City"
+           formControlName="city">
+
+    <input type="date" class="form-control mb-2"
+           formControlName="checkIn">
+
+    <input type="date" class="form-control mb-2"
+           formControlName="checkOut">
+
+  </div>
+
+  <!-- ================= SIGHTSEEING ================= -->
+  <div *ngIf="item.get('type')?.value === 'SIGHTSEEING'">
+
+    <input class="form-control mb-2" placeholder="Place Name"
+           formControlName="placeName">
+
+    <input class="form-control mb-2" placeholder="Description"
+           formControlName="description">
+
+    <input type="time" class="form-control mb-2"
+           formControlName="time">
+
+  </div>
+
+  <!-- ================= ACTIVITY ================= -->
+  <div *ngIf="item.get('type')?.value === 'ACTIVITY'">
+
+    <input class="form-control mb-2" placeholder="Activity Name"
+           formControlName="activityName">
+
+    <input class="form-control mb-2" placeholder="Duration"
+           formControlName="duration">
+
+    <input class="form-control mb-2" placeholder="Vendor"
+           formControlName="vendor">
+
+  </div>
+
+  <!-- REMOVE -->
+  <button type="button"
+          class="btn btn-outline-danger btn-sm"
+          (click)="removeItem(selectedDayIndex, j)">
+    Remove
+  </button>
+
+</div>
 
 </div>
 
         <div class="d-flex gap-2 flex-wrap mt-3">
 
-<button type="button"
-        class="btn btn-outline-info btn-sm"
-        (click)="addItem(selectedDayIndex, 'TRAVEL')">
-  + Travel
-</button>
+  <!-- 1️⃣ TRAVEL -->
+  <button type="button"
+          class="btn btn-outline-info btn-sm"
+          (click)="addItem(selectedDayIndex, 'TRAVEL')">
+    + Travel
+  </button>
 
+  <!-- 2️⃣ SIGHTSEEING -->
+  <button type="button"
+          class="btn btn-outline-primary btn-sm"
+          (click)="addItem(selectedDayIndex, 'SIGHTSEEING')">
+    + Sightseeing
+  </button>
+
+  <!-- 3️⃣ HOTEL -->
   <button type="button"
           class="btn btn-outline-success btn-sm"
           (click)="addItem(selectedDayIndex, 'HOTEL')">
     + Resort/Hotel
   </button>
 
+  <!-- 4️⃣ ACTIVITY -->
   <button type="button"
           class="btn btn-outline-warning btn-sm"
           (click)="addItem(selectedDayIndex, 'ACTIVITY')">
     + Activity
-  </button>
-
-   <!-- NEW -->
-  <button type="button"
-          class="btn btn-outline-info btn-sm"
-          (click)="addItem(selectedDayIndex, 'TRAVEL')">
-    + Travel
   </button>
 
 </div>
