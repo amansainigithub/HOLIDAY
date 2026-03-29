@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SAMPLE_DATA } from './sampleData';
 
 @Component({
   selector: 'app-package4',
@@ -9,38 +10,248 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrl: './package4.css',
 })
 export class Package4 {
+
+//  STAY DATA SATRTING 
+nightsList = [
+  { id: 1, label: '1 Night' },
+  { id: 2, label: '2 Nights' },
+  { id: 3, label: '3 Nights' },
+  { id: 4, label: '4 Nights' },
+  { id: 5, label: '5 Nights' },
+  { id: 6, label: '6 Nights' },
+  { id: 7, label: '7 Nights' },
+  { id: 8, label: '8 Nights' },
+  { id: 9, label: '9 Nights' },
+  { id: 10, label: '10 Nights' }
+];
+
+daysList = [
+  { id: 1, label: '1 Day' },
+  { id: 2, label: '2 Day' },
+  { id: 3, label: '3 Day' },
+  { id: 4, label: '4 Day' },
+  { id: 5, label: '5 Day' },
+  { id: 6, label: '6 Day' },
+  { id: 7, label: '7 Day' },
+  { id: 8, label: '8 Day' },
+  { id: 9, label: '9 Day' },
+  { id: 10, label: '10 Day' }
+];
+
+cities: any[] = [
+  { id: 1, name: 'Manali' },
+  { id: 2, name: 'Goa' },
+  { id: 3, name: 'Jaipur' },
+  { id: 4, name: 'Udaipur' },
+  { id: 5, name: 'Shimla' },
+  { id: 6, name: 'Kashmir' }
+];
+//  STAY DATA ENDING 
+
  packageForm!: FormGroup;
 
   constructor(private fb: FormBuilder , private http:HttpClient) {}
 
   ngOnInit() {
     this.packageForm = this.fb.group({
+      // PACKAGE INFO STARTING
       packageTitle: ['', [
                           Validators.required,
                           Validators.minLength(5),
                           Validators.maxLength(100),
                           Validators.pattern(/^[a-zA-Z0-9\s\-&()]+$/) // special chars restrict
                         ]],
-      startDate: [''], // 👈 ADD THIS
-      packageImages: [[]], // 👈 yaha images store hongi
-      days: this.fb.array([])
+                        
+      startDate: [''], 
+      packageImages: [[]], 
+      stayPlan: this.fb.array([]),
+      // PACKAGE INFO ENDING
+
+      days: this.fb.array([]),
+      
     });
 
-    this.addDay(); // default 1 day
+  // PACKAGE INFO  
+  this.addStay();// default 1 stay plan
 
+  this.addDay(); // default 1 day
+  
 
-    // 👇 API simulate
+  //  👇 API simulate
   setTimeout(() => {
-    this.loadDataFromBackend(this.sampleData);
+    this.loadDataFromBackend(SAMPLE_DATA);
   }, 2000);
+  
   }
+
+
+
+
+
+
+//================================================================================================================
+//============================================= PACKAGE INFO STARTING =============================================
+//ADD STAY PLAN
+addStay() {
+  this.stayPlan.push(this.createStay());
+}
+
+// CREATE STAY PLAN
+createStay(): FormGroup {
+  return this.fb.group({
+    nights: ['', Validators.required],
+    days: ['', Validators.required],
+    city: ['', Validators.required]
+  });
+}
+//GET STAY PLAN
+get stayPlan(): FormArray {
+  return this.packageForm.get('stayPlan') as FormArray;
+}
+
+//REMOVE STAY PLAN
+removeStay(index: number) {
+  this.stayPlan.removeAt(index);
+}
+
+
+
+
+// IMAGES FOR PACKAGE INFO STARTING
+images: any[] = [];
+
+onFileSelect(event: any) {
+  const files = event.target.files;
+
+  for (let file of files) {
+    this.uploadImage(file);
+  }
+}
+
+saveImages() {
+  // 👉 Add into main package form
+  this.packageForm.patchValue({
+    packageImages: this.images
+  });
+
+  console.log("Saved Images", this.images);
+}
+
+removeImage(index: number) {
+  this.images.splice(index, 1);
+}
+
+replaceImage(event: any, index: number) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  this.uploadImage(file, index);
+}uploadImage(file: File, index?: number) {
+
+  if (this.images.length >= 20 && index === undefined) {
+    alert("Max 20 images allowed");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  // Track order: agar naya image hai to use last index + 1 de do
+  const sequence = index !== undefined ? index + 1 : this.images.length + 1;
+  formData.append('order', sequence.toString()); // backend ke liye
+
+  this.http.post<any>('YOUR_API_URL', formData).subscribe({
+    next: (res) => {
+
+      const newImage = {
+        url: res.url,
+        fileName: res.fileName,
+        title: res.title,
+        order: sequence // frontend me bhi order track
+      };
+
+      // 👉 replace or add
+      if (index !== undefined) {
+        this.images[index] = newImage;
+      } else {
+        this.images.push(newImage);
+      }
+    },
+
+    error: () => {
+
+      const dummy = {
+        url: 'https://images.unsplash.com/photo-1598890777032-bde835ba27c2',
+        fileName: file.name,
+        title: 'Dummy Image',
+        order: sequence
+      };
+
+      if (index !== undefined) {
+        this.images[index] = dummy;
+      } else {
+        this.images.push(dummy);
+      }
+    }
+  });
+}
+// IMAGES FOR PACKAGE INFO ENDING
+
+
+//==============================================================================================================
+//============================================= PACKAGE INFO ENDING =============================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ===============================================================================================================
+// ============================================ITINIARY STARTING==================================================
 
   // ===== DAYS =====
-  get days(): FormArray {
-    return this.packageForm.get('days') as FormArray;
-  }
 
-  createDay(): FormGroup {
+  addDay() {
+  const day = this.createDay();
+  this.days.push(day);
+
+  // default ek item (slot) open hoga
+  this.addItem(this.days.length - 1, 'TRAVEL');
+  this.addItem(this.days.length - 1, 'SIGHTSEEING');
+}
+
+createDay(): FormGroup {
   return this.fb.group({
     dayTitle: ['', Validators.required],
     date: ['', Validators.required], // 👈 NEW FIELD
@@ -48,8 +259,13 @@ export class Package4 {
   });
 }
 
-startDate!: string;
+get days(): FormArray {
+    return this.packageForm.get('days') as FormArray;
+}
 
+
+
+startDate!: string;
 onStartDateChange(event: any) {
   this.startDate = event.target.value;
 
@@ -73,14 +289,7 @@ selectDay(index: number) {
   this.selectedDayIndex = index;
 }
 
-addDay() {
-  const day = this.createDay();
-  this.days.push(day);
 
-  // default ek item (slot) open hoga
-   this.addItem(this.days.length - 1, 'TRAVEL');
-  this.addItem(this.days.length - 1, 'SIGHTSEEING');
-}
 
 createItem(type: string): FormGroup {
 
@@ -100,7 +309,8 @@ createItem(type: string): FormGroup {
       hotelName: ['', Validators.required],
       city: ['', Validators.required],
       checkIn: [''],
-      checkOut: ['']
+      checkOut: [''],
+      images: [[]]
     });
   }
 
@@ -109,7 +319,8 @@ createItem(type: string): FormGroup {
       type: [type],
       placeName: ['', Validators.required],
       description: [''],
-      time: ['']
+      time: [''],
+      images: [[]]
     });
   }
 
@@ -118,14 +329,15 @@ createItem(type: string): FormGroup {
       type: [type],
       activityName: ['', Validators.required],
       duration: [''],
-      vendor: ['']
+      vendor: [''],
+      images: [[]]
     });
   }
 
   if (type === 'MEAL') {
   return this.fb.group({
     type: [type],
-    mealType: ['', Validators.required], // Breakfast/Lunch/Dinner
+    mealType: ['', Validators.required],
     menu: ['', Validators.required],
     time: ['']
   });
@@ -142,7 +354,7 @@ addItem(dayIndex: number, type: string) {
   this.getItems(dayIndex).push(this.createItem(type));
 }
 
-  removeDay(index: number) {
+removeDay(index: number) {
   this.days.removeAt(index);
 
   if (this.selectedDayIndex >= this.days.length) {
@@ -150,7 +362,7 @@ addItem(dayIndex: number, type: string) {
   }
 
   if (this.days.length === 0) {
-    this.addDay(); // optional safeguard
+    this.addDay();
   }
 }
 
@@ -158,31 +370,6 @@ addItem(dayIndex: number, type: string) {
 removeItem(dayIndex: number, itemIndex: number) {
   this.getItems(dayIndex).removeAt(itemIndex);
 }
-
-  // ===== SLOTS =====
-  createSlot(): FormGroup {
-    return this.fb.group({
-      startTime: ['', Validators.required],
-      endTime: ['', Validators.required],
-      activity: ['', Validators.required],
-      hotel: this.fb.group({
-        hotelName: [''],
-        city: ['']
-      })
-    });
-  }
-
-  getSlots(dayIndex: number): FormArray {
-    return this.days.at(dayIndex).get('slots') as FormArray;
-  }
-
-  addSlot(dayIndex: number) {
-    this.getSlots(dayIndex).push(this.createSlot());
-  }
-
-  removeSlot(dayIndex: number, slotIndex: number) {
-    this.getSlots(dayIndex).removeAt(slotIndex);
-  }
 
   getDayForm(index: number): FormGroup {
   return this.days.at(index) as FormGroup;
@@ -197,66 +384,269 @@ removeItem(dayIndex: number, itemIndex: number) {
 
 
 
+//SIGHTSEEING IMAGES STARTING
 
+sightseeingImages: { [key: string]: any[] } = {};
+currentKey!: string;
+currentSightseeingImages: any[] = [];
 
+openSightseeingModal(dayIndex: number, itemIndex: number) {
+  this.currentKey = `${dayIndex}_${itemIndex}`;
 
+  this.currentSightseeingImages =
+    this.sightseeingImages[this.currentKey] || [];
 
+  const modal = new (window as any).bootstrap.Modal(
+    document.getElementById('sightseeingImageModal')
+  );
+  modal.show();
+}
 
-
-
-// IMAGES=======================================
-images: any[] = [];
-
-onFileSelect(event: any) {
+onSightseeingFileSelect(event: any) {
   const files = event.target.files;
 
   for (let file of files) {
-    this.uploadImage(file);
+    this.uploadSightseeingImage(file);
   }
 }
 
-uploadImage(file: File) {
+uploadSightseeingImage(file: File, index?: number) {
+
+  if (this.currentSightseeingImages.length >= 10 && index === undefined) {
+    alert("Max 10 images allowed");
+    return;
+  }
 
   const formData = new FormData();
   formData.append('file', file);
 
+  // 👇 sequence maintain karna important hai
+  const sequence = index !== undefined
+    ? index + 1
+    : this.currentSightseeingImages.length + 1;
+
+  formData.append('order', sequence.toString());
+
   this.http.post<any>('YOUR_API_URL', formData).subscribe({
+
+    // ✅ SUCCESS (REAL BACKEND)
     next: (res) => {
 
-      // EXPECTED RESPONSE
-      // { url, fileName, title }
-
-      this.images.push({
+      const newImage = {
         url: res.url,
         fileName: res.fileName,
-        title: res.title
-      });
-
-    },
-    error: () => {
-
-      // 🔥 DUMMY FALLBACK
-      const dummy = {
-        url: 'https://images.unsplash.com/photo-1598890777032-bde835ba27c2',
-        fileName: file.name,
-        title: 'Dummy Image'
+        title: res.title || 'Sightseeing Image',
+        order: sequence
       };
 
-      this.images.push(dummy);
+      if (index !== undefined) {
+        this.currentSightseeingImages[index] = newImage;
+      } else {
+        this.currentSightseeingImages.push(newImage);
+      }
+    },
+
+    // ❌ ERROR → DUMMY IMAGE
+    error: () => {
+
+      const dummy = {
+        url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e', // 👈 nice fallback
+        fileName: file.name,
+        title: 'Dummy Sightseeing Image',
+        order: sequence
+      };
+
+      if (index !== undefined) {
+        this.currentSightseeingImages[index] = dummy;
+      } else {
+        this.currentSightseeingImages.push(dummy);
+      }
+    }
+  });
+}
+removeSightseeingImage(index: number) {
+  this.currentSightseeingImages.splice(index, 1);
+}
+
+replaceSightseeingImage(event: any, index: number) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  this.uploadSightseeingImage(file, index);
+}
+
+saveSightseeingImages() {
+
+  this.sightseeingImages[this.currentKey] =
+    this.currentSightseeingImages;
+
+  // 👇 update form also
+  const [dayIndex, itemIndex] = this.currentKey.split('_').map(Number);
+
+  const item = this.getItems(dayIndex).at(itemIndex);
+
+  item.patchValue({
+    images: this.currentSightseeingImages
+  });
+
+  console.log("Saved SS Images:", this.currentSightseeingImages);
+}
+
+//SIGHTSEEING IMAGES ENDING.....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// HOTEL IMAGES STARTING
+hotelImagesMap: { [key: string]: any[] } = {};
+
+currentHotelKey!: string;
+currentHotelImages: any[] = [];
+
+openHotelModal(dayIndex: number, itemIndex: number) {
+  this.currentHotelKey = `${dayIndex}_${itemIndex}`;
+
+  this.currentHotelImages =
+    this.hotelImagesMap[this.currentHotelKey] || [];
+
+  const modal = new (window as any).bootstrap.Modal(
+    document.getElementById('hotelImageModal')
+  );
+  modal.show();
+}
+
+uploadHotelImage(file: File, index?: number) {
+
+  if (this.currentHotelImages.length >= 10 && index === undefined) {
+    alert("Max 10 images allowed");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const sequence = index !== undefined
+    ? index + 1
+    : this.currentHotelImages.length + 1;
+
+  formData.append('order', sequence.toString());
+
+  this.http.post<any>('YOUR_API_URL', formData).subscribe({
+
+    // ✅ REAL
+    next: (res) => {
+
+      const newImage = {
+        url: res.url,
+        fileName: res.fileName,
+        title: res.title || 'Hotel Image',
+        order: sequence
+      };
+
+      if (index !== undefined) {
+        this.currentHotelImages[index] = newImage;
+      } else {
+        this.currentHotelImages.push(newImage);
+      }
+    },
+
+    // ❌ DUMMY
+    error: () => {
+
+      const dummy = {
+        url: 'https://images.unsplash.com/photo-1566073771259-6a8506099945',
+        fileName: file.name,
+        title: 'Dummy Hotel Image',
+        order: sequence
+      };
+
+      if (index !== undefined) {
+        this.currentHotelImages[index] = dummy;
+      } else {
+        this.currentHotelImages.push(dummy);
+      }
     }
   });
 }
 
-saveImages() {
-  // 👉 Add into main package form
-  this.packageForm.patchValue({
-    packageImages: this.images
-  });
 
-  console.log("Saved Images", this.images);
+
+onHotelFileSelect(event: any) {
+  const files = event.target.files;
+
+  for (let file of files) {
+    this.uploadHotelImage(file);
+  }
+}
+
+removeHotelImage(index: number) {
+  this.currentHotelImages.splice(index, 1);
+}
+
+replaceHotelImage(event: any, index: number) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  this.uploadHotelImage(file, index);
 }
 
 
+saveHotelImages() {
+
+  this.hotelImagesMap[this.currentHotelKey] =
+    this.currentHotelImages;
+
+  const [dayIndex, itemIndex] = this.currentHotelKey.split('_').map(Number);
+
+  const item = this.getItems(dayIndex).at(itemIndex);
+
+  item.patchValue({
+    images: this.currentHotelImages
+  });
+
+  console.log("Saved Hotel Images:", this.currentHotelImages);
+}
+// HOTEL IMAGES ENDING.....
 
 
 
@@ -273,8 +663,202 @@ saveImages() {
 
 
 
-// ====================================SUBMIT  DATA AND TRANSFORM DATA=============================================================================
-  // ===== SUBMIT  DATA AND TRANSFORM DATA=================================================================================
+
+
+
+
+
+
+
+// ACTIVITY IMAGES STARTING
+activityImagesMap: { [key: string]: any[] } = {};
+
+currentActivityKey!: string;
+currentActivityImages: any[] = [];
+
+
+openActivityModal(dayIndex: number, itemIndex: number) {
+  this.currentActivityKey = `${dayIndex}_${itemIndex}`;
+
+  this.currentActivityImages =
+    this.activityImagesMap[this.currentActivityKey] || [];
+
+  const modal = new (window as any).bootstrap.Modal(
+    document.getElementById('activityImageModal')
+  );
+  modal.show();
+}
+
+uploadActivityImage(file: File, index?: number) {
+
+  if (this.currentActivityImages.length >= 10 && index === undefined) {
+    alert("Max 10 images allowed");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const sequence = index !== undefined
+    ? index + 1
+    : this.currentActivityImages.length + 1;
+
+  formData.append('order', sequence.toString());
+
+  this.http.post<any>('YOUR_API_URL', formData).subscribe({
+
+    // ✅ REAL
+    next: (res) => {
+
+      const newImage = {
+        url: res.url,
+        fileName: res.fileName,
+        title: res.title || 'Activity Image',
+        order: sequence
+      };
+
+      if (index !== undefined) {
+        this.currentActivityImages[index] = newImage;
+      } else {
+        this.currentActivityImages.push(newImage);
+      }
+    },
+
+    // ❌ DUMMY
+    error: () => {
+
+      const dummy = {
+        url: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
+        fileName: file.name,
+        title: 'Dummy Activity Image',
+        order: sequence
+      };
+
+      if (index !== undefined) {
+        this.currentActivityImages[index] = dummy;
+      } else {
+        this.currentActivityImages.push(dummy);
+      }
+    }
+  });
+}
+
+onActivityFileSelect(event: any) {
+  const files = event.target.files;
+
+  for (let file of files) {
+    this.uploadActivityImage(file);
+  }
+}
+
+removeActivityImage(index: number) {
+  this.currentActivityImages.splice(index, 1);
+}
+
+replaceActivityImage(event: any, index: number) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  this.uploadActivityImage(file, index);
+}
+
+
+saveActivityImages() {
+
+  this.activityImagesMap[this.currentActivityKey] =
+    this.currentActivityImages;
+
+  const [dayIndex, itemIndex] = this.currentActivityKey.split('_').map(Number);
+
+  const item = this.getItems(dayIndex).at(itemIndex);
+
+  item.patchValue({
+    images: this.currentActivityImages
+  });
+
+  console.log("Saved Activity Images:", this.currentActivityImages);
+}
+// ACTIVITY IMAGES ENDING...
+
+
+
+
+
+// ===============================================================================================================
+// ============================================ITINIARY ENDING ==================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ===============================================================================================
+// ===== ===================================SUBMIT DATA===========================================
 onSubmit() {
   if (this.packageForm.invalid) {
     this.packageForm.markAllAsTouched();
@@ -292,18 +876,30 @@ onSubmit() {
     packageTitle: this.packageForm.value.packageTitle,
     startDate: this.packageForm.value.startDate,
     packageImages: this.packageForm.value.packageImages,
-    days: transformedDays
+    days: transformedDays,
+    stayPlan: this.transformStayPlan(this.packageForm.value.stayPlan) // 👈 added
   };
 
   console.log("Backend Payload:", payload);
   // this.http.post('YOUR_API_URL', payload).subscribe(...)
 }
 
+// STAY PLAN TRANSFORM START
+transformStayPlan(stayPlan: any[]): any[] {
+  return stayPlan.map(plan => ({
+    nights: plan.nights,
+    days: plan.days,
+    city: plan.city
+  }));
+}
+// STAY PLAN TRANSFORM END
+
 
 
 
 transformItemsToBackend(days: any[]): any[] {
   return days.map(day => {
+
     const backendDay: any = {
       dayTitle: day.dayTitle,
       date: day.date,
@@ -331,7 +927,13 @@ transformItemsToBackend(days: any[]): any[] {
               hotelName: item.hotelName,
               city: item.city,
               checkIn: item.checkIn,
-              checkOut: item.checkOut
+              checkOut: item.checkOut,
+              images: item.images ? item.images.map((img: any, index: number) => ({
+                url: img.url,
+                fileName: img.fileName,
+                title: img.title,
+                order: img.order ?? index + 1
+              })) : []
             });
             break;
 
@@ -339,15 +941,27 @@ transformItemsToBackend(days: any[]): any[] {
             backendDay.sightseeing.push({
               placeName: item.placeName,
               description: item.description,
-              time: item.time
+              time: item.time,
+              images: item.images ? item.images.map((img: any, index: number) => ({
+                url: img.url,
+                fileName: img.fileName,
+                title: img.title,
+                order: img.order ?? index + 1
+              })) : []
             });
-            break;
+            break;  
 
           case 'ACTIVITY':
             backendDay.activities.push({
               activityName: item.activityName,
               duration: item.duration,
-              vendor: item.vendor
+              vendor: item.vendor,
+              images: item.images ? item.images.map((img: any, index: number) => ({
+                url: img.url,
+                fileName: img.fileName,
+                title: img.title,
+                order: img.order ?? index + 1
+              })) : []
             });
             break;
 
@@ -370,12 +984,8 @@ transformItemsToBackend(days: any[]): any[] {
 }
 
 
-
-
-
-
+// CHECK ERROR STARTING
 formErrors: string[] = [];
-
 getFormErrors(): string[] {
   const errors: string[] = [];
 
@@ -418,11 +1028,9 @@ getFormErrors(): string[] {
 
   return errors;
 }
-
-// ========================================SUBMIT  DATA AND TRANSFORM DATA=========================================
-// ========================================SUBMIT  DATA AND TRANSFORM DATA=========================================
-
-
+// CHECK ERROR ENDING
+// ========================================SUBMIT  DATA ENDING=========================================
+// ====================================================================================================
 
 
 
@@ -454,165 +1062,23 @@ getFormErrors(): string[] {
 
 
 
-// ==================== BACKEND → FORM ====================
-sampleData = {
-    packageTitle: "Dehradun Adventure Trip",
-    startDate: "2026-04-10",
-    packageImages: [
-        {
-            url: "https://images.unsplash.com/photo-1598890777032-bde835ba27c2",
-            fileName: "bing-hui-yau-y85Tir86Q34-unsplash.jpg",
-            title: "Dehradun Scenic View"
-        },
-        {
-            url: "https://images.unsplash.com/photo-1598890777032-bde835ba27c2",
-            fileName: "WhatsApp Image 2025-12-09 at 12.48.38 PM.jpeg",
-            title: "Robber's Cave"
-        },
-        {
-            url: "https://images.unsplash.com/photo-1598890777032-bde835ba27c2",
-            fileName: "landingimage2.png",
-            title: "Forest Research Institute"
-        }
-    ],
-    days: [
-        {
-            dayTitle: "Day 1: Arrival & City Exploration",
-            date: "2026-04-10",
-            travels: [
-                {
-                    from: "Delhi",
-                    to: "Dehradun",
-                    mode: "Bus",
-                    time: "07:00"
-                }
-            ],
-            hotels: [
-                {
-                    hotelName: "Hotel Pacific Dehradun",
-                    city: "Dehradun",
-                    checkIn: "2026-04-10",
-                    checkOut: "2026-04-12"
-                }
-            ],
-            sightseeing: [
-                {
-                    placeName: "Robber's Cave",
-                    description: "A natural cave formation with a river running inside.",
-                    time: "11:00"
-                },
-                {
-                    placeName: "Forest Research Institute",
-                    description: "Historic institute with beautiful colonial architecture and museums.",
-                    time: "15:00"
-                }
-            ],
-            activities: [
-                {
-                    activityName: "Local Market Walk",
-                    duration: "2 hours",
-                    vendor: "City Tour Guide"
-                }
-            ],
-            meals: [
-                {
-                    mealType: "Breakfast",
-                    menu: "Paratha, Tea, Fruit",
-                    time: "07:30"
-                },
-                {
-                    mealType: "Lunch",
-                    menu: "Dal Makhani, Rice, Salad",
-                    time: "13:00"
-                },
-                {
-                    mealType: "Dinner",
-                    menu: "Paneer Butter Masala, Roti, Dessert",
-                    time: "20:00"
-                }
-            ]
-        },
-        {
-            dayTitle: "Day 2: Adventure & Nature",
-            date: "2026-04-11",
-            travels: [
-                {
-                    from: "Dehradun",
-                    to: "Malsi Deer Park",
-                    mode: "Car",
-                    time: "09:00"
-                }
-            ],
-            hotels: [
-                {
-                    hotelName: "Hotel Pacific Dehradun",
-                    city: "Dehradun",
-                    checkIn: "2026-04-10",
-                    checkOut: "2026-04-12"
-                }
-            ],
-            sightseeing: [
-                {
-                    placeName: "Mindrolling Monastery",
-                    description: "One of the largest Buddhist centers in India.",
-                    time: "11:00"
-                },
-                {
-                    placeName: "Tapkeshwar Temple",
-                    description: "Ancient cave temple dedicated to Lord Shiva.",
-                    time: "15:00"
-                }
-            ],
-            activities: [
-                {
-                    activityName: "River Rafting in Song River",
-                    duration: "2 hours",
-                    vendor: "Adventure Club Dehradun"
-                },
-                {
-                    activityName: "Hiking to Sahastradhara",
-                    duration: "3 hours",
-                    vendor: "Local Trekking Guide"
-                }
-            ],
-            meals: [
-                {
-                    mealType: "Breakfast",
-                    menu: "Omelette, Toast, Coffee",
-                    time: "07:30"
-                },
-                {
-                    mealType: "Lunch",
-                    menu: "Rajma, Rice, Salad",
-                    time: "13:00"
-                },
-                {
-                    mealType: "Dinner",
-                    menu: "Mixed Veg Curry, Roti, Dessert",
-                    time: "20:00"
-                }
-            ]
-        }
-    ]
-}
 
 
+// ==================== SAMPLE DATA ====================
 
 
   loadDataFromBackend(backendData: any) {
   const formData = this.transformBackendToFormData(backendData);
 
-  // patch form values
   this.packageForm.patchValue({
     packageTitle: formData.packageTitle,
     startDate: formData.startDate,
     packageImages: formData.packageImages || [],
   });
 
-  // sync component image array for preview
   this.images = formData.packageImages || [];
 
-  // clear days and patch them
+  // DAYS
   this.days.clear();
   formData.days.forEach((day: any) => {
     const dayGroup = this.createDay();
@@ -627,47 +1093,119 @@ sampleData = {
     });
   });
 
+  // ✅ STAY PLAN ADD KARO
+  this.stayPlan.clear();
+  if (formData.stayPlan) {
+    formData.stayPlan.forEach((stay: any) => {
+      const stayGroup = this.createStay();
+      stayGroup.patchValue(stay);
+      this.stayPlan.push(stayGroup);
+    });
+  }
+
   this.selectedDayIndex = 0;
 }
 
   patchForm(data: any) {
-    this.packageForm.patchValue({
-      packageTitle: data.packageTitle,
-      startDate: data.startDate,
-      packageImages: data.packageImages || [],
+  this.packageForm.patchValue({
+    packageTitle: data.packageTitle,
+    startDate: data.startDate,
+    packageImages: data.packageImages || [],
+  });
+
+  this.days.clear();
+
+  data.days.forEach((day: any) => {
+    const dayGroup = this.createDay();
+    this.days.push(dayGroup);
+    dayGroup.patchValue({ dayTitle: day.dayTitle, date: day.date });
+
+    const itemsArray = dayGroup.get('items') as FormArray;
+    day.items.forEach((item: any) => {
+      const itemGroup = this.createItem(item.type);
+      itemGroup.patchValue(item);
+      itemsArray.push(itemGroup);
     });
+  });
 
-    this.days.clear();
-
-    data.days.forEach((day: any) => {
-      const dayGroup = this.createDay();
-      this.days.push(dayGroup);
-      dayGroup.patchValue({ dayTitle: day.dayTitle, date: day.date });
-
-      const itemsArray = dayGroup.get('items') as FormArray;
-      day.items.forEach((item: any) => {
-        const itemGroup = this.createItem(item.type);
-        itemGroup.patchValue(item);
-        itemsArray.push(itemGroup);
-      });
+  // ✅ STAY PLAN
+  this.stayPlan.clear();
+  if (data.stayPlan) {
+    data.stayPlan.forEach((stay: any) => {
+      const stayGroup = this.createStay();
+      stayGroup.patchValue(stay);
+      this.stayPlan.push(stayGroup);
     });
-
-    this.selectedDayIndex = 0;
   }
+  this.selectedDayIndex = 0;
+}
 
-  transformBackendToFormData(data: any) {
-    const transformed = { ...data };
-    transformed.days = transformed.days.map((day: any) => {
-      const items: any[] = [];
-      if (day.travels) day.travels.forEach((t: any) => items.push({ ...t, type: 'TRAVEL' }));
-      if (day.hotels) day.hotels.forEach((h: any) => items.push({ ...h, type: 'HOTEL' }));
-      if (day.sightseeing) day.sightseeing.forEach((s: any) => items.push({ ...s, type: 'SIGHTSEEING' }));
-      if (day.activities) day.activities.forEach((a: any) => items.push({ ...a, type: 'ACTIVITY' }));
-      if (day.meals) day.meals.forEach((m: any) => items.push({ ...m, type: 'MEAL' }));
-      return { ...day, items };
-    });
-    return transformed;
-  }
+transformBackendToFormData(data: any) {
+  const transformed = { ...data };
+
+  transformed.days = transformed.days.map((day: any) => {
+    const items: any[] = [];
+
+    if (day.travels) {
+      day.travels.forEach((t: any) =>
+        items.push({ ...t, type: 'TRAVEL' })
+      );
+    }
+
+    if (day.hotels) {
+      day.hotels.forEach((h: any) =>
+        items.push({
+          ...h,
+          type: 'HOTEL',
+          images: h.images || [] // ✅ important
+        })
+      );
+    }
+
+    if (day.sightseeing) {
+      day.sightseeing.forEach((s: any) =>
+        items.push({
+          ...s,
+          type: 'SIGHTSEEING',
+          images: s.images || []
+        })
+      );
+    }
+
+    if (day.activities) {
+      day.activities.forEach((a: any) =>
+        items.push({
+          ...a,
+          type: 'ACTIVITY',
+          images: a.images || [] // ✅ important
+        })
+      );
+    }
+
+    if (day.meals) {
+      day.meals.forEach((m: any) =>
+        items.push({ ...m, type: 'MEAL' })
+      );
+    }
+
+    return { ...day, items };
+  });
+
+  return transformed;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   

@@ -12,13 +12,76 @@
   box-shadow: 0 4px 15px rgba(0,0,0,0.08);
 }
 
-/* ACTIVE DAY */
+/* ===== DAY CARD ENDING ===== */
+
+
+
+
+
+
+
+/* STAY PLAN STARTING */
+.stay-row {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px;
+  transition: all 0.25s ease;
+  background: #fff;
+}
+
+/* 🔥 Hover Effect */
+.stay-row:hover {
+  border: 1.5px dashed #0d6efd;   /* Bootstrap blue */
+  background-color: #f0f7ff;      /* light blue bg */
+  cursor: pointer;
+}
+
+/* Optional: thoda smooth feel */
+.stay-row select {
+  transition: all 0.2s ease;
+}
+
+.stay-row:hover select {
+  border-color: #0d6efd;
+}
+/* STAY PLAN ENDING */
+
+
+
+
+
+
+
+
+
+
+
+/* ACTIVE DAY STARTING */
 .active-day {
   border: 2px solid #0d6efd;
   background: #f0f6ff;
 }
+/* ACTIVE DAY ENDING */
 
-/* ===== SLOT CARD ===== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== SLOT CARD SATRTING ===== */
 .slot-card {
   border: 1px dashed #ccc;
   border-radius: 10px;
@@ -31,7 +94,23 @@
   border-color: #0d6efd;
 }
 
-/* ===== FORM INPUT ===== */
+/* ===== SLOT CARD ENDING ===== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== FORM INPUT STARTING ===== */
 input.form-control,
 select.form-control,
 textarea.form-control {
@@ -44,20 +123,39 @@ textarea.form-control {
   border-color: #dc3545 !important;
   box-shadow: none !important;
 }
+/* ===== FORM INPUT ENDING ===== */
 
-/* input.form-control:focus,
-select.form-control:focus,
-textarea.form-control:focus {
-  border-color: #0d6efd;
-  box-shadow: 0 0 5px rgba(13,110,253,0.2);
-} */
+
+
+
+
+
+
+
+
+
 
 /* ===== BUTTONS ===== */
 .btn {
   border-radius: 8px;
 }
 
-/* ===== NAV TABS ===== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== NAV TABS STARTING ===== */
 .nav-tabs .nav-link {
   cursor: pointer;
   border-radius: 8px 8px 0 0;
@@ -69,8 +167,23 @@ textarea.form-control:focus {
   color: #fff;
   border-color: #0d6efd;
 }
+/* ===== NAV TABS ENDING ===== */
 
-/* ===== DAY PILLS (TOP TABS) ===== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== DAY PILLS (TOP TABS) SATRTING ===== */
 .nav-pills .nav-link {
   border-radius: 10px;
   padding: 8px 14px;
@@ -90,17 +203,409 @@ textarea.form-control:focus {
   color: #fff;
 }
 
+/* ===== DAY PILLS (TOP TABS) ENDING ===== */
+
+
+
+
+
+
+
+
+
 /* ===== CARD SHADOW ===== */
 .card {
   border-radius: 12px;
   border: none;
 }
+/* ===== CARD SHADOW ===== */
+
+
+
+
 
 /* ===== SMOOTH UI ===== */
 button {
   transition: 0.2s;
 }
 
+
+
+
+
 button:hover {
   transform: translateY(-1px);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* IMAGE GRID STARTING */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+}
+
+.image-card {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  height: 140px;
+}
+
+.image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* REMOVE BUTTON */
+.remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* CHANGE BUTTON */
+.change-btn {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 3px 8px;
+  font-size: 11px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* ADD CARD */
+.add-card {
+  border: 2px dashed #6c63ff;
+  border-radius: 13px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.add-content {
+  text-align: center;
+  color: #6c63ff;
+}
+
+.add-content i {
+  font-size: 22px;
+}
+
+.add-content span {
+  display: block;
+  font-size: 13px;
+}
+
+.full-label {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+/* IMAGE GRID ENDING */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* SIGHTSEEING MODELS STARTING */
+.ss-image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.ss-image-card {
+  position: relative;
+  height: 120px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ss-image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ss-remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+}
+
+.ss-change-btn {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  background: #000;
+  color: #fff;
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.ss-add-card {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ss-add-content {
+  text-align: center;
+  cursor: pointer;
+}
+/* SIGHTSEEING MODELS ENDING */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* HOTEL CSSS MODEL STARTING */
+
+.hotel-image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.hotel-image-card {
+  position: relative;
+  height: 120px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.hotel-image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hotel-remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+}
+
+.hotel-change-btn {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  background: #000;
+  color: #fff;
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.hotel-add-card {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hotel-add-content {
+  text-align: center;
+  cursor: pointer;
+}
+
+/* HOTEL CSSS MODEL ENDING */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ACTIVITY CSS MODEL STARTING*/
+.activity-image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.activity-image-card {
+  position: relative;
+  height: 120px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.activity-image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.activity-remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+}
+
+.activity-change-btn {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  background: #000;
+  color: #fff;
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.activity-add-card {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activity-add-content {
+  text-align: center;
+  cursor: pointer;
+}
+
+/* ACTIVITY CSS MODEL ENDING*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* STAY 2N CARD CSS STARTING*/
+.stay-row {
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+/* STAY 2N CARD CSS ENDING*/

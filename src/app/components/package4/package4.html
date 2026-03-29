@@ -1,49 +1,63 @@
-
-
 <div class="container mt-4 mb-5">
+
+
+  <!-- PACKAGE  FORM STARTING -->
   <form [formGroup]="packageForm" (ngSubmit)="onSubmit()">
 
-    <!-- MAIN TABS -->
+    <!-- MAIN TABS START -->
     <ul class="nav nav-tabs mb-4">
+      <!-- PACKAGE INFO -->
       <li class="nav-item">
-        <button type="button" class="nav-link"
-                [class.active]="activeTab === 'info'"
-                (click)="activeTab='info'">
+        <button type="button" class="nav-link" [class.active]="activeTab === 'info'" (click)="activeTab='info'">
           Package Info
         </button>
       </li>
 
+      <!-- ITINERARY -->
       <li class="nav-item">
-        <button type="button" class="nav-link"
-                [class.active]="activeTab === 'itinerary'"
-                (click)="activeTab='itinerary'">
+        <button type="button" class="nav-link" [class.active]="activeTab === 'itinerary'"
+          (click)="activeTab='itinerary'">
           Itinerary
         </button>
       </li>
 
+      <!-- REVIEW -->
       <li class="nav-item">
-        <button type="button" class="nav-link"
-                [class.active]="activeTab === 'review'"
-                (click)="activeTab='review'">
+        <button type="button" class="nav-link" [class.active]="activeTab === 'review'" (click)="activeTab='review'">
           Review
         </button>
       </li>
     </ul>
+    <!-- MAIN TABS END -->
 
-    <!-- ================= PACKAGE INFO ================= -->
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    <!-- ================= PACKAGE INFO STARTING================= -->
     <div *ngIf="activeTab === 'info'" class="card p-4 shadow-sm">
 
       <h5 class="mb-3">Package Details</h5>
 
       <div class="row g-3">
+
         <div class="col-md-6">
+
           <label>Package Title</label>
-          <input class="form-control"
-            formControlName="packageTitle"
-            [class.is-invalid]="packageForm.get('packageTitle')?.touched &&
-                                packageForm.get('packageTitle')?.invalid">
-          <div class="text-danger mt-1" style="font-size: 11px;"
-              *ngIf="packageForm.get('packageTitle')?.touched &&
+          <input class="form-control" formControlName="packageTitle" 
+           [class.is-invalid]="packageForm.get('packageTitle')?.touched && packageForm.get('packageTitle')?.invalid">
+
+          <div class="text-danger mt-1" style="font-size: 11px;" *ngIf="packageForm.get('packageTitle')?.touched &&
                       packageForm.get('packageTitle')?.invalid">
 
             <div *ngIf="packageForm.get('packageTitle')?.errors?.['required']">
@@ -61,302 +75,760 @@
             <div *ngIf="packageForm.get('packageTitle')?.errors?.['pattern']">
               Only letters, numbers & basic symbols allowed
             </div>
-
           </div>
         </div>
 
         <div class="col-md-6">
           <label>Start Date</label>
-          <input type="date" class="form-control" formControlName="startDate"
-                 (change)="onStartDateChange($event)">
+          <input type="date" class="form-control" formControlName="startDate" (change)="onStartDateChange($event)">
         </div>
+
       </div>
 
-      <div class="row g-3">
-          <!-- PACKAGE INFO -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5>Package Info</h5>
 
-              <!-- SMALL BUTTON -->
-              <button type="button"
-                      class="btn btn-sm btn-primary"
-                      data-bs-toggle="modal"
-                      data-bs-target="#imageModal">
-                Upload Images
-              </button>
+      <!-- STAY PLAN STARTING -->
+      <div class="mt-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="mb-0">Stay Plan (Nights / Days / City)</h6>
+
+          <button type="button" class="btn btn-primary btn-sm" (click)="addStay()">
+            + Add
+          </button>
+        </div>
+
+        <div formArrayName="stayPlan">
+
+          <div *ngFor="let stay of stayPlan.controls; let i = index" [formGroupName]="i"
+            class="row g-2 align-items-center mb-2 mt-1 stay-row">
+
+            <!-- Nights -->
+            <div class="col-md-2">
+              <select class="form-select" formControlName="nights">
+                <option value="">Nights</option>
+
+                <option *ngFor="let n of nightsList" [value]="n.id">
+                  {{ n.label }}
+                </option>
+              </select>
+
             </div>
 
+            <!-- Days -->
+            <div class="col-md-2">
+              <select class="form-select" formControlName="days">
+                <option value="">Days</option>
 
-            <!-- MODAL S IMAGES INFO -->
-                <div class="modal fade" id="imageModal" tabindex="-1">
-                  <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
+                <option *ngFor="let d of daysList" [value]="d.id">
+                  {{ d.label }}
+                </option>
+              </select>
+            </div>
 
-                      <div class="modal-header">
-                        <h5 class="modal-title">Upload Package Images</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                      </div>
+            <!-- City -->
+            <div class="col-md-5">
+              <select class="form-select" formControlName="city">
+                <option value="">Select City</option>
 
-                      <div class="modal-body">
+                <option *ngFor="let c of cities" [value]="c.name">
+                  {{ c.name }}
+                </option>
+              </select>
+            </div>
 
-                        <!-- FILE INPUT -->
-                        <input type="file" class="form-control mb-3"
-                              (change)="onFileSelect($event)" multiple>
-
-                        <!-- PREVIEW -->
-                        <div class="row">
-                          <div class="col-md-4 mb-3" *ngFor="let img of images">
-                            <div class="card">
-                              <img [src]="img.url" class="card-img-top" height="150">
-                              <div class="card-body p-2">
-                                <small>{{img.fileName}}</small><br>
-                                <small class="text-muted">{{img.title}}</small>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                      </div>
-
-                      <div class="modal-footer">
-                        <button class="btn btn-success" (click)="saveImages()">Save</button>
-                      </div>
-
-                    </div>
-                  </div>
-                </div>
-                 <!-- MODAL ENDING IMAGES INFO -->
-      </div>
-
-
-
-      <div class="text-end mt-4">
-        <button type="button" class="btn btn-primary"
-                (click)="activeTab='itinerary'">
-          Next →
-        </button>
-      </div>
-
-    </div>
-
-    <!-- ================= ITINERARY ================= -->
-    <div *ngIf="activeTab === 'itinerary'">
-
-      <!-- DAY TABS -->
-      <ul class="nav nav-pills mb-3 flex-wrap">
-        <li class="nav-item me-2"
-            *ngFor="let day of days.controls; let i=index">
-
-          <button type="button"
-                  class="nav-link"
-                  [class.active]="selectedDayIndex === i"
-                  (click)="selectDay(i)">
-
-            Day {{i+1}} <br>
-            <small>{{ day.get('date')?.value || 'No date' }}</small>
-
-          </button>
-        </li>
-
-        <!-- ADD DAY -->
-        <li class="nav-item">
-          <button type="button"
-                  class="btn btn-success btn-sm"
-                  (click)="addDay()">
-            + Day
-          </button>
-        </li>
-      </ul>
-
-      <!-- ACTIVE DAY CONTENT -->
-      <div *ngIf="days.length > 0"
-           [formGroup]="getDayForm(selectedDayIndex)"
-           class="card p-4 shadow-sm">
-
-        <!-- HEADER -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-
-          <!-- LEFT -->
-          <h5 class="mb-0">Day {{selectedDayIndex + 1}}</h5>
-
-          <!-- RIGHT -->
-          <div class="d-flex align-items-center gap-2">
-
-            <input type="date"
-                   class="form-control w-auto"
-                   formControlName="date">
-
-            <!-- DELETE ICON -->
-            <button type="button"
-                    class="btn btn-light text-danger border"
-                    (click)="removeDay(selectedDayIndex)">
-              <i class="bi bi-trash"></i>
-            </button>
+            <!-- Remove Button -->
+            <div class="col-md-2">
+              <button type="button" class="btn btn-outline-danger btn-sm w-100" (click)="removeStay(i)">
+                Remove
+              </button>
+            </div>
 
           </div>
 
         </div>
 
-        <!-- TITLE -->
-        <input class="form-control mb-3"
-               placeholder="Day Title"
-               formControlName="dayTitle">
+      </div>
+      <!-- STAY PLAN ENDING -->
 
-        <!-- SLOTS -->
-        <div formArrayName="items">
 
-  <div *ngFor="let item of getItems(selectedDayIndex).controls; let j=index"
-     [formGroupName]="j"
-     class="slot-card p-3 mb-3">
+      <div class="row g-3">
+        <!-- PACKAGE INFO -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5>Package Info</h5>
 
-  <!-- TYPE -->
-  <span class="badge bg-primary mb-2">
-    {{ item.get('type')?.value }}
-  </span>
-
-  <!-- ================= TRAVEL ================= -->
-  <div *ngIf="item.get('type')?.value === 'TRAVEL'">
-
-    <input class="form-control mb-2" placeholder="From"
-           formControlName="from">
-
-    <input class="form-control mb-2" placeholder="To"
-           formControlName="to">
-
-    <input class="form-control mb-2" placeholder="Mode (Bus/Flight)"
-           formControlName="mode">
-
-    <input type="time" class="form-control mb-2"
-           formControlName="time">
-
-  </div>
-
-  <!-- ================= HOTEL ================= -->
-  <div *ngIf="item.get('type')?.value === 'HOTEL'">
-
-    <input class="form-control mb-2" placeholder="Hotel Name"
-           formControlName="hotelName">
-
-    <input class="form-control mb-2" placeholder="City"
-           formControlName="city">
-
-    <input type="date" class="form-control mb-2"
-           formControlName="checkIn">
-
-    <input type="date" class="form-control mb-2"
-           formControlName="checkOut">
-
-  </div>
-
-  <!-- ================= SIGHTSEEING ================= -->
-  <div *ngIf="item.get('type')?.value === 'SIGHTSEEING'">
-
-    <input class="form-control mb-2" placeholder="Place Name"
-           formControlName="placeName">
-
-    <input class="form-control mb-2" placeholder="Description"
-           formControlName="description">
-
-    <input type="time" class="form-control mb-2"
-           formControlName="time">
-
-  </div>
-
-  <!-- ================= ACTIVITY ================= -->
-  <div *ngIf="item.get('type')?.value === 'ACTIVITY'">
-
-    <input class="form-control mb-2" placeholder="Activity Name"
-           formControlName="activityName">
-
-    <input class="form-control mb-2" placeholder="Duration"
-           formControlName="duration">
-
-    <input class="form-control mb-2" placeholder="Vendor"
-           formControlName="vendor">
-
-  </div>
-
-  <!-- ================= MEAL ================= -->
-  <div *ngIf="item.get('type')?.value === 'MEAL'">
-
-    <input class="form-control mb-2" placeholder="Meal Type (Breakfast/Lunch/Dinner)"
-          formControlName="mealType">
-
-    <input class="form-control mb-2" placeholder="Menu"
-          formControlName="menu">
-
-    <input type="time" class="form-control mb-2"
-          formControlName="time">
-
-  </div>
-
-  <!-- REMOVE -->
-  <button type="button"
-          class="btn btn-outline-danger btn-sm"
-          (click)="removeItem(selectedDayIndex, j)">
-    Remove
-  </button>
-
-</div>
-
-</div>
-
-        <div class="d-flex gap-2 flex-wrap mt-3">
-
-  <!-- 1️⃣ TRAVEL -->
-  <button type="button"
-          class="btn btn-outline-info btn-sm"
-          (click)="addItem(selectedDayIndex, 'TRAVEL')">
-    + Travel
-  </button>
-
-  <!-- 2️⃣ SIGHTSEEING -->
-  <button type="button"
-          class="btn btn-outline-primary btn-sm"
-          (click)="addItem(selectedDayIndex, 'SIGHTSEEING')">
-    + Sightseeing
-  </button>
-
-  <!-- 3️⃣ HOTEL -->
-  <button type="button"
-          class="btn btn-outline-success btn-sm"
-          (click)="addItem(selectedDayIndex, 'HOTEL')">
-    + Resort/Hotel
-  </button>
-
-  <!-- 4️⃣ ACTIVITY -->
-  <button type="button"
-          class="btn btn-outline-warning btn-sm"
-          (click)="addItem(selectedDayIndex, 'ACTIVITY')">
-    + Activity
-  </button>
-
-  <!-- 5️⃣ MEAL -->
-<button type="button"
-        class="btn btn-outline-secondary btn-sm"
-        (click)="addItem(selectedDayIndex, 'MEAL')">
-  + Meal
-</button>
-
-</div>
-
+          <!-- SMALL BUTTON -->
+          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#imageModal">
+            Upload Images
+          </button>
+        </div>
       </div>
 
-      <div class="d-flex justify-content-between mt-4">
-        <button type="button" class="btn btn-secondary"
-                (click)="activeTab='info'">
-          ← Back
-        </button>
 
-        <button type="button" class="btn btn-primary"
-                (click)="activeTab='review'">
+
+       <!-- MODAL PACKAGE INFO IMAGES STARTING-->
+        <div class="modal fade" id="imageModal" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+              <div class="modal-header">
+                <h5 class="modal-title">Upload Package Images</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+
+              <div class="modal-body">
+
+                <!-- IMAGE GRID -->
+                <div class="image-grid">
+
+                  <!-- EXISTING IMAGES -->
+                  <div class="image-card" *ngFor="let img of images; let i = index">
+
+                    <img [src]="img.url" />
+
+                    <!-- REMOVE BUTTON -->
+                    <button class="remove-btn" (click)="removeImage(i)">
+                      ✕
+                    </button>
+
+                    <!-- CHANGE BUTTON -->
+                    <label class="change-btn">
+                      Change
+                      <input type="file" hidden (change)="replaceImage($event, i)">
+                    </label>
+
+                  </div>
+
+                  <!-- ADD IMAGE BOX -->
+                  <div class="add-card" *ngIf="images.length < 20">
+                    <label class="full-label">
+                      <input type="file" hidden multiple (change)="onFileSelect($event)">
+
+                      <div class="add-content">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Add Images</span>
+                      </div>
+                    </label>
+                  </div>
+
+                </div>
+
+                <!-- LIMIT TEXT -->
+                <small class="text-muted">
+                  Max 20 images allowed ({{images.length}}/20)
+                </small>
+
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn btn-success" (click)="saveImages()">Save</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+     <!-- MODAL PACKAGE INFO IMAGES ENDING...-->
+
+      <div class="text-end mt-4">
+        <button type="button" class="btn btn-primary" (click)="activeTab='itinerary'">
           Next →
         </button>
       </div>
 
     </div>
 
-    <!-- ================= REVIEW ================= -->
+
+<!-- ==================================================================================================================
+================================================================================================================== -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ==================================================================================================================
+================================================================================================================== -->
+
+    <!-- ================= ITINERARY STARTING================= -->
+    <div *ngIf="activeTab === 'itinerary'">
+
+      <!-- DAY TABS STARTING-->
+      <ul class="nav nav-pills mb-3 flex-wrap">
+
+        <li class="nav-item me-2" *ngFor="let day of days.controls; let i=index">
+          <button type="button" class="nav-link" [class.active]="selectedDayIndex === i" (click)="selectDay(i)">
+            Day {{i+1}} <br>
+            <small>{{ day.get('date')?.value || 'No date' }}</small>
+          </button>
+        </li>
+
+        <!-- ADD DAY -->
+        <li class="nav-item">
+          <button type="button" class="btn btn-success btn-sm" (click)="addDay()">
+            + Day
+          </button>
+        </li>
+      </ul>
+      <!-- DAY TABS ENDING-->
+
+
+      <!-- ACTIVE DAY CONTENT STARTING-->
+      <div *ngIf="days.length > 0" [formGroup]="getDayForm(selectedDayIndex)" class="card p-4 shadow-sm">
+
+        <!-- HEADER STARTING-->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+          <!-- LEFT -  DAY 1 ex DAY 2....-->
+          <h5 class="mb-0">Day {{selectedDayIndex + 1}}</h5>
+
+          <!-- RIGHT DATE AND REMOVE BUTTON START-->
+          <div class="d-flex align-items-center gap-2">
+
+            <input type="date" class="form-control w-auto" formControlName="date">
+
+            <!-- DELETE ICON -->
+            <button type="button" class="btn btn-light text-danger border" (click)="removeDay(selectedDayIndex)">
+              <i class="bi bi-trash"></i>
+            </button>
+
+          </div>
+          <!-- RIGHT DATE AND REMOVE BUTTON END-->
+
+        </div>
+        <!-- HEADER ENDING-->
+
+
+        <!-- TITLE STARTING-->
+        <input class="form-control mb-3" placeholder="Day Title" formControlName="dayTitle">
+        <!-- TITLE ENDING -->
+
+
+        <!-- SLOTS STARTING-->
+        <div formArrayName="items">
+
+          <div *ngFor="let item of getItems(selectedDayIndex).controls; let j=index" [formGroupName]="j"
+            class="slot-card p-3 mb-3">
+
+            <!-- TYPE -->
+            <span class="badge bg-primary mb-2">
+              {{ item.get('type')?.value }}
+            </span>
+
+
+
+
+
+
+
+
+
+
+
+            <!-- ================= TRAVEL STARTING================= -->
+            <div *ngIf="item.get('type')?.value === 'TRAVEL'">
+
+              <input class="form-control mb-2" placeholder="From" formControlName="from">
+
+              <input class="form-control mb-2" placeholder="To" formControlName="to">
+
+              <input class="form-control mb-2" placeholder="Mode (Bus/Flight)" formControlName="mode">
+
+              <input type="time" class="form-control mb-2" formControlName="time">
+
+            </div>
+            <!-- ================= TRAVEL ENDING================= -->
+
+
+
+
+
+
+
+
+
+
+
+            <!-- ================= HOTEL STARTING================= -->
+            <div *ngIf="item.get('type')?.value === 'HOTEL'">
+
+              <input class="form-control mb-2" placeholder="Hotel Name" formControlName="hotelName">
+
+              <input class="form-control mb-2" placeholder="City" formControlName="city">
+
+              <input type="date" class="form-control mb-2" formControlName="checkIn">
+
+              <input type="date" class="form-control mb-2" formControlName="checkOut">
+
+              <button type="button" class="btn btn-sm btn-outline-success mb-2"
+                (click)="openHotelModal(selectedDayIndex, j)">
+                Upload Hotel Images
+              </button>
+
+
+              <!-- HOTEL IMAGE MODAL STARTING-->
+              <div class="modal fade" id="hotelImageModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+
+                    <div class="modal-header">
+                      <h5 class="modal-title">Upload Hotel Images</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                      <div class="hotel-image-grid">
+
+                        <div class="hotel-image-card" *ngFor="let img of currentHotelImages; let i = index">
+
+                          <img [src]="img.url" />
+
+                          <button class="hotel-remove-btn" (click)="removeHotelImage(i)">
+                            ✕
+                          </button>
+
+                          <label class="hotel-change-btn">
+                            Change
+                            <input type="file" hidden (change)="replaceHotelImage($event, i)">
+                          </label>
+
+                        </div>
+
+                        <!-- ADD -->
+                        <div class="hotel-add-card" *ngIf="currentHotelImages.length < 10">
+                          <label class="hotel-full-label">
+                            <input type="file" hidden multiple (change)="onHotelFileSelect($event)">
+
+                            <div class="hotel-add-content">
+                              <i class="bi bi-plus-lg"></i>
+                              <span>Add Images</span>
+                            </div>
+                          </label>
+                        </div>
+
+                      </div>
+
+                      <small class="text-muted">
+                        Max 10 images allowed ({{currentHotelImages.length}}/10)
+                      </small>
+
+                    </div>
+
+                    <div class="modal-footer">
+                      <button class="btn btn-success" (click)="saveHotelImages()">
+                        Save
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+                <!-- HOTEL IMAGE MODAL ENDING-->
+
+            </div>
+            <!-- ================= HOTEL ENDING================= -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
+            <!-- ================= SIGHTSEEING STARTING================= -->
+            <div *ngIf="item.get('type')?.value === 'SIGHTSEEING'">
+
+              <input class="form-control mb-2" placeholder="Place Name" formControlName="placeName">
+
+              <input class="form-control mb-2" placeholder="Description" formControlName="description">
+
+              <input type="time" class="form-control mb-2" formControlName="time">
+
+              <!-- IMAGE BUTTON -->
+              <button type="button" class="btn btn-sm btn-outline-primary mb-2"
+                (click)="openSightseeingModal(selectedDayIndex, j)">
+                Upload Images
+              </button>
+
+              <!-- SIGHTSEEING IMAGE MODAL STARTNG-->
+              <div class="modal fade" id="sightseeingImageModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+
+                    <div class="modal-header">
+                      <h5 class="modal-title">Upload Sightseeing Images</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                      <div class="ss-image-grid">
+
+                        <div class="ss-image-card" *ngFor="let img of currentSightseeingImages; let i = index">
+
+                          <img [src]="img.url" />
+
+                          <button class="ss-remove-btn" (click)="removeSightseeingImage(i)">
+                            ✕
+                          </button>
+
+                          <label class="ss-change-btn">
+                            Change
+                            <input type="file" hidden (change)="replaceSightseeingImage($event, i)">
+                          </label>
+
+                        </div>
+
+                        <!-- ADD -->
+                        <div class="ss-add-card" *ngIf="currentSightseeingImages.length < 10">
+                          <label class="ss-full-label">
+                            <input type="file" hidden multiple (change)="onSightseeingFileSelect($event)">
+
+                            <div class="ss-add-content">
+                              <i class="bi bi-plus-lg"></i>
+                              <span>Add Images</span>
+                            </div>
+                          </label>
+                        </div>
+
+                      </div>
+
+                      <small class="text-muted">
+                        Max 10 images allowed ({{currentSightseeingImages.length}}/10)
+                      </small>
+
+                    </div>
+
+                    <div class="modal-footer">
+                      <button class="btn btn-success" (click)="saveSightseeingImages()">
+                        Save
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <!-- SIGHTSEEING IMAGE MODAL ENDING -->
+
+            </div>
+           <!-- SIGHTSEEING ENDING -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- ================= ACTIVITY STARTING ================= -->
+            <div *ngIf="item.get('type')?.value === 'ACTIVITY'">
+
+              <input class="form-control mb-2" placeholder="Activity Name" formControlName="activityName">
+
+              <input class="form-control mb-2" placeholder="Duration" formControlName="duration">
+
+              <input class="form-control mb-2" placeholder="Vendor" formControlName="vendor">
+
+              <button type="button" class="btn btn-sm btn-outline-warning mb-2"
+                (click)="openActivityModal(selectedDayIndex, j)">
+                Upload Activity Images
+              </button>
+
+
+              <!-- ACTIVITY IMAGE MODAL STARTING -->
+              <div class="modal fade" id="activityImageModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+
+                    <div class="modal-header">
+                      <h5 class="modal-title">Upload Activity Images</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                      <div class="activity-image-grid">
+
+                        <div class="activity-image-card" *ngFor="let img of currentActivityImages; let i = index">
+
+                          <img [src]="img.url" />
+
+                          <button class="activity-remove-btn" (click)="removeActivityImage(i)">
+                            ✕
+                          </button>
+
+                          <label class="activity-change-btn">
+                            Change
+                            <input type="file" hidden (change)="replaceActivityImage($event, i)">
+                          </label>
+
+                        </div>
+
+                        <!-- ADD -->
+                        <div class="activity-add-card" *ngIf="currentActivityImages.length < 10">
+                          <label class="activity-full-label">
+                            <input type="file" hidden multiple (change)="onActivityFileSelect($event)">
+
+                            <div class="activity-add-content">
+                              <i class="bi bi-plus-lg"></i>
+                              <span>Add Images</span>
+                            </div>
+                          </label>
+                        </div>
+
+                      </div>
+
+                      <small class="text-muted">
+                        Max 10 images allowed ({{currentActivityImages.length}}/10)
+                      </small>
+
+                    </div>
+
+                    <div class="modal-footer">
+                      <button class="btn btn-success" (click)="saveActivityImages()">
+                        Save
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <!-- ACTIVITY IMAGE MODAL ENDING -->
+
+            </div>
+              <!-- ================= ACTIVITY ENDING ================= -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- ================= MEAL STARTING ================= -->
+            <div *ngIf="item.get('type')?.value === 'MEAL'">
+
+              <input class="form-control mb-2" placeholder="Meal Type (Breakfast/Lunch/Dinner)"
+                formControlName="mealType">
+
+              <input class="form-control mb-2" placeholder="Menu" formControlName="menu">
+
+              <input type="time" class="form-control mb-2" formControlName="time">
+
+            </div>
+            <!-- ================= MEAL ENDING ================= -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <!-- REMOVE BUTTON FOR ALL INDIVIDUAL ITEMS STARTING-->
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeItem(selectedDayIndex, j)">
+              Remove
+            </button>
+              <!-- REMOVE BUTTON FOR ALL INDIVIDUAL ITEMS ENDING-->
+
+          </div>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+        <!-- ADD ITEM BUTTONS STARTING -->
+        <div class="d-flex gap-2 flex-wrap mt-3">
+
+          <!-- 1️⃣ TRAVEL -->
+          <button type="button" class="btn btn-outline-info btn-sm" (click)="addItem(selectedDayIndex, 'TRAVEL')">
+            + Travel
+          </button>
+
+          <!-- 2️⃣ SIGHTSEEING -->
+          <button type="button" class="btn btn-outline-primary btn-sm"
+            (click)="addItem(selectedDayIndex, 'SIGHTSEEING')">
+            + Sightseeing
+          </button>
+
+          <!-- 3️⃣ HOTEL -->
+          <button type="button" class="btn btn-outline-success btn-sm" (click)="addItem(selectedDayIndex, 'HOTEL')">
+            + Resort/Hotel
+          </button>
+
+          <!-- 4️⃣ ACTIVITY -->
+          <button type="button" class="btn btn-outline-warning btn-sm" (click)="addItem(selectedDayIndex, 'ACTIVITY')">
+            + Activity
+          </button>
+
+          <!-- 5️⃣ MEAL -->
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="addItem(selectedDayIndex, 'MEAL')">
+            + Meal
+          </button>
+
+        </div>
+
+       <!-- ADD ITEM BUTTONS ENDING -->
+
+
+      </div>
+      <!-- ACTIVE DAY CONTENT ENDING -->
+
+
+
+
+      <!-- BACK AND NEXT BUTTONS STARTING -->
+      <div class="d-flex justify-content-between mt-4">
+        <button type="button" class="btn btn-secondary" (click)="activeTab='info'">
+          ← Back
+        </button>
+
+        <button type="button" class="btn btn-primary" (click)="activeTab='review'">
+          Next →
+        </button>
+      </div>
+       <!-- BACK AND NEXT BUTTONS ENDING -->
+
+    </div>
+    <!-- ================= ITINERARY ENDING================= -->
+
+<!-- ==================================================================================================================
+================================================================================================================== -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ==================================================================================================================
+================================================================================================================== -->
+    <!-- ================= REVIEW STARTING================= -->
     <div *ngIf="activeTab === 'review'" class="card p-4 shadow-sm">
 
       <h5>Review Package</h5>
@@ -364,8 +836,7 @@
       <pre>{{ packageForm.value | json }}</pre>
 
       <div class="d-flex justify-content-between mt-3">
-        <button type="button" class="btn btn-secondary"
-                (click)="activeTab='itinerary'">
+        <button type="button" class="btn btn-secondary" (click)="activeTab='itinerary'">
           ← Back
         </button>
 
@@ -375,8 +846,15 @@
       </div>
 
     </div>
+    <!-- ================= REVIEW ENDING================= -->
+     
+
+<!-- ==================================================================================================================
+================================================================================================================== -->
+
 
   </form>
+    <!-- PACKAGE FORM ENDING -->
 </div>
 
 
@@ -392,7 +870,7 @@
 
 
 
-
+<!-- ERROR SHOWING STARTING -->
 <div *ngIf="formErrors.length > 0" class="alert alert-danger">
 
   <strong>Please fix the following:</strong>
@@ -404,3 +882,4 @@
   </ul>
 
 </div>
+<!-- ERROR SHOWING ENDING -->
